@@ -1,0 +1,18 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "name": "feels-like-backend",
+      "path": "feels-like-backend"
+    },
+    {
+      "name": "feels-like-frontend",
+      "path": "feels-like-frontend"
+    }
+  ],
+  "settings": {
+    "jest.disabledWorkspaceFolders": ["feels-like-web", "feels-like-frontend"]
+  }
+}
