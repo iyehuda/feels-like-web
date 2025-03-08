@@ -2,7 +2,6 @@ import { Environment, environment } from "./config";
 import bodyParser from "body-parser";
 import { errors } from "celebrate";
 import express from "express";
-import helloWorldRouter from "./routes/hello-world";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
 import cors from "cors";
@@ -37,7 +36,6 @@ export function createApp() {
     app.use("/docs", swaggerUI.serve, swaggerUI.setup(apiSpecs));
   }
 
-  app.use("/hello", helloWorldRouter);
   app.use("/auth", authRouter);
   app.use("/users", authMiddleware, userRouter);
   app.use(errors());

@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import { apiClient } from "./fetcher";
 
 interface SignupData {
@@ -20,26 +19,18 @@ export async function signup(userData: SignupData): Promise<AuthResponse> {
   form.append("email", userData.email);
   form.append("password", userData.password);
 
-  try {
-    const { data, status } = await apiClient.post("/auth/signup", form);
+  const { data } = await apiClient.post("/auth/signup", form);
 
-    if (status !== 201) {
-      throw new Error(data.message || "Failed to sign up");
-    }
+  return data;
+}
 
-    return data;
-  } catch (error) {
-    let errorMessage = (error as Error)?.message ?? "Failed to sign up";
+export async function login(email: string, password: string): Promise<AuthResponse> {
+  const { data } = await apiClient.post("/auth/login", {
+    email,
+    password,
+  });
 
-    if (error instanceof AxiosError && error.response) {
-      errorMessage =
-        error.response.data.validation?.body?.message ??
-        error.response.data.message ??
-        errorMessage;
-    }
-
-    throw new Error(errorMessage);
-  }
+  return data;
 }
 
 export async function logout(refreshToken: string): Promise<void> {

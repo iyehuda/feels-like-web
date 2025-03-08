@@ -1,23 +1,22 @@
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
-import { useSnackbar } from "../hooks/useSnackbar";
+import { useNavigate, Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
-import { signup } from "../services/auth";
-import FormLayout from "../components/FormLayout";
+import { useSnackbar } from "../hooks/useSnackbar";
+import { useState } from "react";
 import FormFooter from "../components/FormFooter";
-import FormTextField from "../components/FormTextField";
 import FormSubmitButton from "../components/FormSubmitButton";
+import FormTextField from "../components/FormTextField";
+import FormLayout from "../components/FormLayout";
+import { login } from "../services/auth";
 
-type SignupInputs = {
-  fullName: string;
+type LoginInputs = {
   email: string;
   password: string;
 };
 
-function SignupPage() {
-  const navigate = useNavigate();
+function LoginPage() {
   const { setAuthInfo } = useAuth();
+  const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,19 +24,19 @@ function SignupPage() {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<SignupInputs>();
+  } = useForm<LoginInputs>();
 
-  const onSubmit: SubmitHandler<SignupInputs> = async (data) => {
+  const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
     try {
       setIsLoading(true);
-      const response = await signup(data);
+      const response = await login(data.email, data.password);
       setAuthInfo(response.accessToken, response.refreshToken, response.userId);
-      showSnackbar("Account created successfully!", "success");
+      showSnackbar("Welcome!", "success");
       navigate("/");
     } catch (error) {
-      console.error("Signup error:", error);
+      console.error("Login failed:", error);
       showSnackbar(
-        error instanceof Error ? error.message : "Failed to sign up. Please try again.",
+        error instanceof Error ? error.message : "Login failed. Please check your credentials.",
         "error",
       );
     } finally {
@@ -46,25 +45,8 @@ function SignupPage() {
   };
 
   return (
-    <FormLayout
-      title="Sign Up"
-      subtitle="Let's get you all set up so you can access your personal account"
-    >
+    <FormLayout title="Login" subtitle="Login to access your Feels Like account">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Controller
-          name="fullName"
-          control={control}
-          defaultValue=""
-          rules={{ required: "Full Name is required" }}
-          render={({ field }) => (
-            <FormTextField
-              {...field}
-              label="Full Name"
-              error={!!errors.fullName}
-              helperText={errors.fullName ? errors.fullName.message : ""}
-            />
-          )}
-        />
         <Controller
           name="email"
           control={control}
@@ -80,6 +62,7 @@ function SignupPage() {
             <FormTextField
               {...field}
               label="Email"
+              type="email"
               autoComplete="email"
               error={!!errors.email}
               helperText={errors.email ? errors.email.message : ""}
@@ -92,10 +75,6 @@ function SignupPage() {
           defaultValue=""
           rules={{
             required: "Password is required",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters",
-            },
           }}
           render={({ field }) => (
             <FormTextField
@@ -107,13 +86,13 @@ function SignupPage() {
             />
           )}
         />
-        <FormSubmitButton content="Create Account" isLoading={isLoading} />
+        <FormSubmitButton content="Login" isLoading={isLoading} />
+        <FormFooter>
+          Don't have an account? <Link to="/signup">Sign up</Link>
+        </FormFooter>
       </form>
-      <FormFooter>
-        Already have an account? <Link to="/login">Sign up</Link>{" "}
-      </FormFooter>
     </FormLayout>
   );
 }
 
-export default SignupPage;
+export default LoginPage;
