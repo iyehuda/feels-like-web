@@ -23,13 +23,13 @@ const controller = new UsersController();
  *         email:
  *           type: string
  *           description: The user email
- *         username:
+ *         fullName:
  *           type: string
  *           description: The user name
  *       example:
  *         id: "6738b7b2944556561a86110a"
  *         email: "john@example.com"
- *         username: "john"
+ *         fullName: "john"
  */
 
 /**

@@ -2,8 +2,10 @@ import { Segments, celebrate } from "celebrate";
 import Joi from "joi";
 import * as authController from "../controllers/auth";
 import express from "express";
+import upload from "../utils/upload";
 
 const authRouter = express.Router();
+const minPasswordLength = 6;
 
 /**
  * @swagger
@@ -29,14 +31,14 @@ const authRouter = express.Router();
  *     SignupRequest:
  *       type: object
  *       required:
- *         - username
+ *         - fullName
  *         - email
  *         - password
  *         - avatar
  *       properties:
- *         username:
+ *         fullName:
  *           type: string
- *           description: The user username
+ *           description: The user fullName
  *         email:
  *           type: string
  *           description: The user email
@@ -126,11 +128,16 @@ const authRouter = express.Router();
 const signupRequestSchema = {
   [Segments.BODY]: Joi.object({
     email: Joi.string().email().required(),
-    password: Joi.string().required(),
-    username: Joi.string().required(),
+    fullName: Joi.string().required(),
+    password: Joi.string().min(minPasswordLength).required(),
   }),
 };
-authRouter.post("/signup", celebrate(signupRequestSchema), authController.signup);
+authRouter.post(
+  "/signup",
+  upload.single("avatar"),
+  celebrate(signupRequestSchema),
+  authController.signup,
+);
 
 /**
  * @swagger

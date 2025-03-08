@@ -46,7 +46,7 @@ async function getUserByEmailAndPassword(
   email: string,
   password: string,
 ): Promise<HydratedDocument<IUser>> {
-  const unauthorized = Unauthorized("Invalid username or password");
+  const unauthorized = Unauthorized("Invalid email or password");
 
   const user = await User.findOne({ email });
   if (!user) {
@@ -86,7 +86,7 @@ async function getUserByRefreshToken(refreshToken: string): Promise<HydratedDocu
 }
 
 export async function signup(req: Request, res: Response) {
-  const { email, password, username } = req.body;
+  const { email, password, fullName } = req.body;
 
   const emailExists = await User.findOne({ email });
   if (emailExists) {
@@ -96,8 +96,8 @@ export async function signup(req: Request, res: Response) {
   const hashedPassword = await hashPassword(password);
   const user = await User.create({
     email,
+    fullName,
     password: hashedPassword,
-    username,
   });
   const tokens = await generateTokens(user);
 

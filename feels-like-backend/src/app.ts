@@ -30,6 +30,7 @@ export function createApp() {
 
   app.use(morgan(environment === Environment.PROD ? "combined" : "dev"));
   app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cors());
 
   if (environment !== Environment.PROD) {

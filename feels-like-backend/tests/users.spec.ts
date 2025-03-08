@@ -9,7 +9,7 @@ let auth: AuthResponse;
 let teardown: Teardown;
 let testUserDoc: HydratedDocument<IUser>;
 const app = createApp();
-const testUser = { email: "jane@example.com", password: "password123", username: "Jane Doe" };
+const testUser = { email: "jane@example.com", fullName: "Jane Doe", password: "password123" };
 
 beforeAll(async () => {
   const { dbConnectionString, closeDatabase } = await createDatabase();
@@ -39,8 +39,8 @@ describe("GET /users/:id", () => {
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       email: testUser.email,
+      fullName: testUser.fullName,
       id: testUserDoc.id,
-      username: testUser.username,
     });
   });
 

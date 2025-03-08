@@ -7,7 +7,7 @@ import request from "supertest";
 let auth: AuthResponse;
 let teardown: Teardown;
 const app = createApp();
-const testUser = { email: "jane@example.com", password: "password123", username: "Jane Doe" };
+const testUser = { email: "jane@example.com", fullName: "Jane Doe", password: "password123" };
 
 beforeAll(async () => {
   const { dbConnectionString, closeDatabase } = await createDatabase();

@@ -17,8 +17,8 @@ export default class UsersController extends BaseController<IUser> {
     } else {
       res.json({
         email: item.email,
+        fullName: item.fullName,
         id: item.id,
-        username: item.username,
       });
     }
   }
