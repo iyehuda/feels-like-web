@@ -9,6 +9,9 @@ lint:
 	cd feels-like-backend && npm run lint
 	cd feels-like-frontend && npm run lint
 
+clean:
+	cd feels-like-backend && npm run clean
+
 test:
 	cd feels-like-backend && npm run test
 

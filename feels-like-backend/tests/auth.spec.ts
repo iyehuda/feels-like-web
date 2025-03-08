@@ -1,4 +1,4 @@
-import { AuthResponse, Teardown, createDatabase } from "./utils";
+import { AuthResponse, Teardown, avatarPath, createDatabase, signupUser, testUser } from "./utils";
 import User from "../src/models/user";
 import { connect, disconnect } from "../src/db";
 import { createApp } from "../src/app";
@@ -7,7 +7,6 @@ import request from "supertest";
 let auth: AuthResponse;
 let teardown: Teardown;
 const app = createApp();
-const testUser = { email: "jane@example.com", fullName: "Jane Doe", password: "password123" };
 
 beforeAll(async () => {
   const { dbConnectionString, closeDatabase } = await createDatabase();
@@ -32,7 +31,10 @@ function expectAuthResponse(response: object) {
 
 describe("POST /auth/signup", () => {
   test("should create a new user", async () => {
-    const response = await request(app).post("/auth/signup").send(testUser);
+    const response = await signupUser(app, {
+      ...testUser,
+      avatar: avatarPath,
+    });
     expect(response.status).toBe(201);
 
     expectAuthResponse(response.body);
@@ -49,7 +51,10 @@ describe("POST /auth/signup", () => {
   });
 
   test("should fail on email conflict", async () => {
-    const response = await request(app).post("/auth/signup").send(testUser);
+    const response = await signupUser(app, {
+      ...testUser,
+      avatar: avatarPath,
+    });
     expect(response.status).toBe(409);
   });
 });

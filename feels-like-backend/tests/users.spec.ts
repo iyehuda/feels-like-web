@@ -1,4 +1,13 @@
-import { AuthResponse, Teardown, createDatabase, invalidId, nonExistentId } from "./utils";
+import {
+  AuthResponse,
+  Teardown,
+  avatarPath,
+  createDatabase,
+  invalidId,
+  nonExistentId,
+  signupUser,
+  testUser,
+} from "./utils";
 import User, { IUser } from "../src/models/user";
 import { connect, disconnect } from "../src/db";
 import { HydratedDocument } from "mongoose";
@@ -9,7 +18,6 @@ let auth: AuthResponse;
 let teardown: Teardown;
 let testUserDoc: HydratedDocument<IUser>;
 const app = createApp();
-const testUser = { email: "jane@example.com", fullName: "Jane Doe", password: "password123" };
 
 beforeAll(async () => {
   const { dbConnectionString, closeDatabase } = await createDatabase();
@@ -18,7 +26,10 @@ beforeAll(async () => {
   await connect(dbConnectionString);
   await User.deleteMany({});
 
-  const authResponse = await request(app).post("/auth/signup").send(testUser);
+  const authResponse = await signupUser(app, {
+    ...testUser,
+    avatar: avatarPath,
+  });
   expect(authResponse.status).toBe(201);
 
   auth = authResponse.body;

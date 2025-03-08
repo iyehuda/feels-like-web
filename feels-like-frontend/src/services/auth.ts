@@ -4,6 +4,7 @@ interface SignupData {
   fullName: string;
   email: string;
   password: string;
+  avatar: File;
 }
 
 interface AuthResponse {
@@ -18,6 +19,7 @@ export async function signup(userData: SignupData): Promise<AuthResponse> {
   form.append("fullName", userData.fullName);
   form.append("email", userData.email);
   form.append("password", userData.password);
+  form.append("avatar", userData.avatar);
 
   const { data } = await apiClient.post("/auth/signup", form);
 

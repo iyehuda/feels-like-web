@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { HydratedDocument } from "mongoose";
 import { refreshTokenExpires, tokenExpires, tokenSecret } from "../config";
-import { Conflict, Unauthorized } from "http-errors";
+import { BadRequest, Conflict, Unauthorized } from "http-errors";
 import { StringValue } from "ms";
 
 interface Tokens {
@@ -85,8 +85,14 @@ async function getUserByRefreshToken(refreshToken: string): Promise<HydratedDocu
   return user;
 }
 
+// eslint-disable-next-line max-statements
 export async function signup(req: Request, res: Response) {
   const { email, password, fullName } = req.body;
+  const { path: avatar } = req.file || { path: "" };
+
+  if (!avatar) {
+    throw BadRequest("Avatar is required");
+  }
 
   const emailExists = await User.findOne({ email });
   if (emailExists) {
@@ -95,6 +101,7 @@ export async function signup(req: Request, res: Response) {
 
   const hashedPassword = await hashPassword(password);
   const user = await User.create({
+    avatar,
     email,
     fullName,
     password: hashedPassword,

@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
+    "clean": "rm -rf uploads/*",
     "prod": "NODE_ENV=production node .",
     "lint": "prettier --write . && eslint --fix .",
     "test": "jest"

@@ -3,6 +3,7 @@ import { commonSchemaOptions } from "./utils";
 
 export interface IUser extends Document {
   _id: string;
+  avatar: string;
   email: string;
   password: string;
   refreshTokens: string[];
@@ -11,6 +12,7 @@ export interface IUser extends Document {
 
 const userSchema = new Schema<IUser>(
   {
+    avatar: { required: true, type: String },
     email: { required: true, type: String, unique: [true, "email is already taken"] },
     fullName: { required: true, type: String },
     password: { required: true, type: String },
