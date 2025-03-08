@@ -8,6 +8,9 @@ import swaggerUI from "swagger-ui-express";
 import cors from "cors";
 import errorHandler from "error-handler-json";
 import morgan from "morgan";
+import authRouter from "./routes/auth";
+import userRouter from "./routes/users";
+import { authMiddleware } from "./controllers/auth";
 
 const apiSpecs = swaggerJSDoc({
   apis: ["src/routes/*.ts"],
@@ -21,6 +24,7 @@ const apiSpecs = swaggerJSDoc({
   },
 });
 
+// eslint-disable-next-line max-statements
 export function createApp() {
   const app = express();
 
@@ -33,6 +37,8 @@ export function createApp() {
   }
 
   app.use("/hello", helloWorldRouter);
+  app.use("/auth", authRouter);
+  app.use("/users", authMiddleware, userRouter);
   app.use(errors());
   app.use(errorHandler({ includeStack: environment === Environment.DEV }));
 

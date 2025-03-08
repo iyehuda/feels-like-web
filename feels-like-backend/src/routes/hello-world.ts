@@ -49,16 +49,4 @@ helloWorldRouter.get("/world", celebrate(getMessageSchema), controller.getMessag
  */
 helloWorldRouter.get("/version", celebrate(getVersionSchema), controller.getVersion);
 
-/**
- * @swagger
- * /hello/not-found:
- *   get:
- *     summary: Not found
- *     tags: [Hello World]
- *     responses:
- *       404:
- *         description: Not found
- */
-helloWorldRouter.get("/not-found", controller.notFound);
-
 export default helloWorldRouter;

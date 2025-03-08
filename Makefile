@@ -12,5 +12,8 @@ lint:
 test:
 	cd feels-like-backend && npm run test
 
-dev:
+db:
+	docker compose up -d
+
+dev: db
 	npx concurrently -k "cd feels-like-backend && npm run dev" "cd feels-like-frontend && npm run dev"
