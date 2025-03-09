@@ -1,47 +1,46 @@
 import { ReactNode, useState } from "react";
 import AuthContext from "./AuthContext";
 import * as authService from "../services/auth";
+import {
+  AuthInfo,
+  getStoredAuthInfo,
+  emptyAuthState,
+  saveAuthInfo,
+  clearAuthInfo,
+} from "../storage/auth";
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [accessToken, setAccessToken] = useState<string | null>(
-    localStorage.getItem("accessToken"),
-  );
-  const [refreshToken, setRefreshToken] = useState<string | null>(
-    localStorage.getItem("refreshToken"),
-  );
-  const [userId, setUserId] = useState<string | null>(localStorage.getItem("userId"));
+  const [authState, setAuthState] = useState<AuthInfo>(getStoredAuthInfo);
+  const isAuthenticated = !!authState.accessToken;
 
-  const isAuthenticated = !!accessToken;
-
-  const setAuthInfo = (accessToken: string, refreshToken: string, userId: string) => {
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-    localStorage.setItem("userId", userId);
-    setAccessToken(accessToken);
-    setRefreshToken(refreshToken);
-    setUserId(userId);
+  const setAuthInfo = (authInfo: AuthInfo) => {
+    setAuthState(authInfo);
+    saveAuthInfo(authInfo);
   };
 
   const logout = async () => {
-    await authService.logout(refreshToken!);
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userId");
-    setAccessToken(null);
-    setRefreshToken(null);
-    setUserId(null);
+    try {
+      if (authState.refreshToken) {
+        await authService.logout(authState.refreshToken!);
+      }
+    } catch (error) {
+      console.error("Failed to logout", error);
+    } finally {
+      setAuthState(emptyAuthState);
+      clearAuthInfo();
+    }
   };
 
   return (
     <AuthContext.Provider
       value={{
-        accessToken,
-        refreshToken,
-        userId,
+        accessToken: authState.accessToken,
+        refreshToken: authState.refreshToken,
+        userId: authState.userId,
         setAuthInfo,
         logout,
         isAuthenticated,

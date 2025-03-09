@@ -4,6 +4,7 @@ import { CardContent, CardHeader, Button } from "@mui/material";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { UserDetails } from "../components/UserDetails";
 
 function HomePage() {
   const { logout } = useAuth();
@@ -20,6 +21,7 @@ function HomePage() {
       <Card variant="outlined" sx={{ p: 1 }}>
         <CardHeader title="Welcome to Feels Like!" />
         <CardContent>
+          <UserDetails />
           <Button
             variant="outlined"
             color="primary"

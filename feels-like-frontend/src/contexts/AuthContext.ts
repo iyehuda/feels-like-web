@@ -1,10 +1,11 @@
 import { createContext } from "react";
+import { AuthInfo } from "../storage/auth";
 
 interface AuthContextType {
-  accessToken: string | null;
-  refreshToken: string | null;
-  userId: string | null;
-  setAuthInfo: (accessToken: string, refreshToken: string, userId: string) => void;
+  accessToken: string | undefined;
+  refreshToken: string | undefined;
+  userId: string | undefined;
+  setAuthInfo: (authInfo: AuthInfo) => void;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
 }

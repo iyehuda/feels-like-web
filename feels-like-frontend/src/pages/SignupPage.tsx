@@ -75,7 +75,7 @@ function SignupPage() {
         fullName: data.fullName,
         password: data.password,
       });
-      setAuthInfo(response.accessToken, response.refreshToken, response.userId);
+      setAuthInfo(response);
       showSnackbar("Account created successfully!", "success");
       navigate("/");
     } catch (error) {

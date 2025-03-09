@@ -30,7 +30,7 @@ function LoginPage() {
     try {
       setIsLoading(true);
       const response = await login(data.email, data.password);
-      setAuthInfo(response.accessToken, response.refreshToken, response.userId);
+      setAuthInfo(response);
       showSnackbar("Welcome!", "success");
       navigate("/");
     } catch (error) {

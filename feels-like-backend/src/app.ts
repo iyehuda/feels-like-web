@@ -1,4 +1,4 @@
-import { Environment, environment } from "./config";
+import { Environment, environment, uploadsDir } from "./config";
 import bodyParser from "body-parser";
 import { errors } from "celebrate";
 import express from "express";
@@ -36,6 +36,7 @@ export function createApp() {
     app.use("/docs", swaggerUI.serve, swaggerUI.setup(apiSpecs));
   }
 
+  app.use(`/${uploadsDir}`, express.static(uploadsDir));
   app.use("/auth", authRouter);
   app.use("/users", authMiddleware, userRouter);
   app.use(errors());

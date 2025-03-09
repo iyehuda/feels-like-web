@@ -128,4 +128,4 @@ dist
 .pnp.*
 
 uploads/
-test-uploads/
+test-uploads*/

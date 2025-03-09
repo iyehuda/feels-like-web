@@ -16,6 +16,7 @@ export default class UsersController extends BaseController<IUser> {
       throw NotFound("Item not found");
     } else {
       res.json({
+        avatar: item.avatar,
         email: item.email,
         fullName: item.fullName,
         id: item.id,

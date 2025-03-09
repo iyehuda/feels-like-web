@@ -1,9 +1,19 @@
 import axios, { AxiosError } from "axios";
+import { getStoredAuthInfo } from "../storage/auth";
+import { API_CONFIG } from "../config/api";
 
 export const apiClient = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: API_CONFIG.baseURL,
 });
 const fetcher = async (url: string) => apiClient.get(url).then((res) => res.data);
+
+apiClient.interceptors.request.use((config) => {
+  const authInfo = getStoredAuthInfo();
+  if (authInfo.accessToken) {
+    config.headers.Authorization = `Bearer ${authInfo.accessToken}`;
+  }
+  return config;
+});
 
 apiClient.interceptors.response.use(
   (response) => response,
