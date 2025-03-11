@@ -1,0 +1,12 @@
+services:
+  mongo:
+    image: mongo:8.0.5
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+
+volumes:
+  mongo-data:
+    driver: local
