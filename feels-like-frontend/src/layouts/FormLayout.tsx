@@ -1,5 +1,4 @@
 import { Typography, Box, Container } from "@mui/material";
-import Logo from "./Logo";
 
 function FormLayout({
   title,
@@ -12,7 +11,6 @@ function FormLayout({
 }) {
   return (
     <Container maxWidth="sm">
-      <Logo />
       <Box
         display="flex"
         flexDirection="column"

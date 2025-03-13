@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { SnackbarContext } from "../contexts/SnackbarContext";
 
-export const useSnackbar = () => {
+export default function useSnackbar() {
   const context = useContext(SnackbarContext);
   if (context === undefined) {
     throw new Error("useSnackbar must be used within a SnackbarProvider");
   }
   return context;
-};
+}

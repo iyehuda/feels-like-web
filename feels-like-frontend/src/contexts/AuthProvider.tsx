@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import AuthContext from "./AuthContext";
+import { AuthContext } from "./AuthContext";
 import * as authService from "../services/auth";
 import {
   AuthInfo,
@@ -13,7 +13,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export function AuthProvider({ children }: AuthProviderProps) {
+export default function AuthProvider({ children }: AuthProviderProps) {
   const [authState, setAuthState] = useState<AuthInfo>(getStoredAuthInfo);
   const isAuthenticated = !!authState.accessToken;
 

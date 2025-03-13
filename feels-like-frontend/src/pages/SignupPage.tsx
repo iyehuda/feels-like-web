@@ -1,15 +1,16 @@
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { useSnackbar } from "../hooks/useSnackbar";
-import { useAuth } from "../hooks/useAuth";
+import useSnackbar from "../hooks/useSnackbar";
+import useAuth from "../hooks/useAuth";
 import { signup } from "../services/auth";
-import FormLayout from "../components/FormLayout";
+import FormLayout from "../layouts/FormLayout";
 import FormFooter from "../components/FormFooter";
 import FormTextField from "../components/FormTextField";
 import FormSubmitButton from "../components/FormSubmitButton";
 import { Box, Typography, Avatar } from "@mui/material";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
+import StandalonePageLayout from "../layouts/StandalonePageLayout";
 
 type SignupInputs = {
   fullName: string;
@@ -18,7 +19,7 @@ type SignupInputs = {
   avatar: FileList;
 };
 
-function SignupPage() {
+export default function SignupPage() {
   const navigate = useNavigate();
   const { setAuthInfo } = useAuth();
   const { showSnackbar } = useSnackbar();
@@ -90,113 +91,112 @@ function SignupPage() {
   };
 
   return (
-    <FormLayout
-      title="Sign Up"
-      subtitle="Let's get you all set up so you can access your personal account"
-    >
-      <form noValidate onSubmit={handleSubmit(onSubmit)}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            my: 1,
-          }}
-        >
-          <Avatar
-            src={avatarPreview || ""}
-            sx={{ width: 100, height: 100, mb: 1, cursor: "pointer" }}
-            onClick={() => avatarInputRef.current?.click()}
+    <StandalonePageLayout>
+      <FormLayout
+        title="Sign Up"
+        subtitle="Let's get you all set up so you can access your personal account"
+      >
+        <form noValidate onSubmit={handleSubmit(onSubmit)}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              my: 1,
+            }}
           >
-            {!avatarPreview && <AddAPhotoIcon />}
-          </Avatar>
-          <Typography variant="caption" color={errors.avatar ? "error" : "text.secondary"}>
-            {errors.avatar ? "Avatar is required" : "Click to upload profile picture"}
-          </Typography>
+            <Avatar
+              src={avatarPreview || ""}
+              sx={{ width: 100, height: 100, mb: 1, cursor: "pointer" }}
+              onClick={() => avatarInputRef.current?.click()}
+            >
+              {!avatarPreview && <AddAPhotoIcon />}
+            </Avatar>
+            <Typography variant="caption" color={errors.avatar ? "error" : "text.secondary"}>
+              {errors.avatar ? "Avatar is required" : "Click to upload profile picture"}
+            </Typography>
+            <Controller
+              name="avatar"
+              control={control}
+              rules={{ required: "Avatar is required" }}
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              render={({ field: { ref, onChange, value, ...field } }) => (
+                <input
+                  {...field}
+                  ref={(e) => {
+                    ref(e);
+                    avatarInputRef.current = e;
+                  }}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => onChange(e.target.files)}
+                  style={{ display: "none" }}
+                />
+              )}
+            />
+          </Box>
           <Controller
-            name="avatar"
+            name="fullName"
             control={control}
-            rules={{ required: "Avatar is required" }}
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            render={({ field: { ref, onChange, value, ...field } }) => (
-              <input
+            defaultValue=""
+            rules={{ required: "Full Name is required" }}
+            render={({ field }) => (
+              <FormTextField
                 {...field}
-                ref={(e) => {
-                  ref(e);
-                  avatarInputRef.current = e;
-                }}
-                type="file"
-                accept="image/*"
-                onChange={(e) => onChange(e.target.files)}
-                style={{ display: "none" }}
+                label="Full Name"
+                error={!!errors.fullName}
+                helperText={errors.fullName ? errors.fullName.message : ""}
               />
             )}
           />
-        </Box>
-
-        <Controller
-          name="fullName"
-          control={control}
-          defaultValue=""
-          rules={{ required: "Full Name is required" }}
-          render={({ field }) => (
-            <FormTextField
-              {...field}
-              label="Full Name"
-              error={!!errors.fullName}
-              helperText={errors.fullName ? errors.fullName.message : ""}
-            />
-          )}
-        />
-        <Controller
-          name="email"
-          control={control}
-          defaultValue=""
-          rules={{
-            required: "Email is required",
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Invalid email address",
-            },
-          }}
-          render={({ field }) => (
-            <FormTextField
-              {...field}
-              label="Email"
-              autoComplete="email"
-              error={!!errors.email}
-              helperText={errors.email ? errors.email.message : ""}
-            />
-          )}
-        />
-        <Controller
-          name="password"
-          control={control}
-          defaultValue=""
-          rules={{
-            required: "Password is required",
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters",
-            },
-          }}
-          render={({ field }) => (
-            <FormTextField
-              {...field}
-              label="Password"
-              type="password"
-              error={!!errors.password}
-              helperText={errors.password ? errors.password.message : ""}
-            />
-          )}
-        />
-        <FormSubmitButton content="Create Account" isLoading={isLoading} />
-      </form>
-      <FormFooter>
-        Already have an account? <Link to="/login">Sign up</Link>{" "}
-      </FormFooter>
-    </FormLayout>
+          <Controller
+            name="email"
+            control={control}
+            defaultValue=""
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Invalid email address",
+              },
+            }}
+            render={({ field }) => (
+              <FormTextField
+                {...field}
+                label="Email"
+                autoComplete="email"
+                error={!!errors.email}
+                helperText={errors.email ? errors.email.message : ""}
+              />
+            )}
+          />
+          <Controller
+            name="password"
+            control={control}
+            defaultValue=""
+            rules={{
+              required: "Password is required",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters",
+              },
+            }}
+            render={({ field }) => (
+              <FormTextField
+                {...field}
+                label="Password"
+                type="password"
+                error={!!errors.password}
+                helperText={errors.password ? errors.password.message : ""}
+              />
+            )}
+          />
+          <FormSubmitButton content="Create Account" isLoading={isLoading} />
+        </form>
+        <FormFooter>
+          Already have an account? <Link to="/login">Sign up</Link>{" "}
+        </FormFooter>
+      </FormLayout>
+    </StandalonePageLayout>
   );
 }
-
-export default SignupPage;

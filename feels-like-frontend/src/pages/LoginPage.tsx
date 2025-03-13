@@ -1,20 +1,21 @@
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useNavigate, Link } from "react-router";
-import { useAuth } from "../hooks/useAuth";
-import { useSnackbar } from "../hooks/useSnackbar";
+import useAuth from "../hooks/useAuth";
+import useSnackbar from "../hooks/useSnackbar";
 import { useState } from "react";
 import FormFooter from "../components/FormFooter";
 import FormSubmitButton from "../components/FormSubmitButton";
 import FormTextField from "../components/FormTextField";
-import FormLayout from "../components/FormLayout";
+import FormLayout from "../layouts/FormLayout";
 import { login } from "../services/auth";
+import StandalonePageLayout from "../layouts/StandalonePageLayout";
 
 type LoginInputs = {
   email: string;
   password: string;
 };
 
-function LoginPage() {
+export default function LoginPage() {
   const { setAuthInfo } = useAuth();
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
@@ -45,54 +46,54 @@ function LoginPage() {
   };
 
   return (
-    <FormLayout title="Login" subtitle="Login to access your Feels Like account">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Controller
-          name="email"
-          control={control}
-          defaultValue=""
-          rules={{
-            required: "Email is required",
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Invalid email address",
-            },
-          }}
-          render={({ field }) => (
-            <FormTextField
-              {...field}
-              label="Email"
-              type="email"
-              autoComplete="email"
-              error={!!errors.email}
-              helperText={errors.email ? errors.email.message : ""}
-            />
-          )}
-        />
-        <Controller
-          name="password"
-          control={control}
-          defaultValue=""
-          rules={{
-            required: "Password is required",
-          }}
-          render={({ field }) => (
-            <FormTextField
-              {...field}
-              label="Password"
-              type="password"
-              error={!!errors.password}
-              helperText={errors.password ? errors.password.message : ""}
-            />
-          )}
-        />
-        <FormSubmitButton content="Login" isLoading={isLoading} />
-        <FormFooter>
-          Don't have an account? <Link to="/signup">Sign up</Link>
-        </FormFooter>
-      </form>
-    </FormLayout>
+    <StandalonePageLayout>
+      <FormLayout title="Login" subtitle="Login to access your Feels Like account">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name="email"
+            control={control}
+            defaultValue=""
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Invalid email address",
+              },
+            }}
+            render={({ field }) => (
+              <FormTextField
+                {...field}
+                label="Email"
+                type="email"
+                autoComplete="email"
+                error={!!errors.email}
+                helperText={errors.email ? errors.email.message : ""}
+              />
+            )}
+          />
+          <Controller
+            name="password"
+            control={control}
+            defaultValue=""
+            rules={{
+              required: "Password is required",
+            }}
+            render={({ field }) => (
+              <FormTextField
+                {...field}
+                label="Password"
+                type="password"
+                error={!!errors.password}
+                helperText={errors.password ? errors.password.message : ""}
+              />
+            )}
+          />
+          <FormSubmitButton content="Login" isLoading={isLoading} />
+          <FormFooter>
+            Don't have an account? <Link to="/signup">Sign up</Link>
+          </FormFooter>
+        </form>
+      </FormLayout>
+    </StandalonePageLayout>
   );
 }
-
-export default LoginPage;

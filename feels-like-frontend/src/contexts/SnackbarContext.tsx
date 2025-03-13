@@ -1,4 +1,4 @@
-import { createContext, ReactNode } from "react";
+import { createContext } from "react";
 import { AlertColor } from "@mui/material";
 
 interface SnackbarContextType {
@@ -6,7 +6,3 @@ interface SnackbarContextType {
 }
 
 export const SnackbarContext = createContext<SnackbarContextType | undefined>(undefined);
-
-export interface SnackbarProviderProps {
-  children: ReactNode;
-}

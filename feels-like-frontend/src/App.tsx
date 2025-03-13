@@ -1,24 +1,42 @@
-import { BrowserRouter } from "react-router";
-import AppRoutes from "./routes";
+import { Outlet } from "react-router";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import "./App.css";
 import { theme } from "./styles/theme";
-import { AuthProvider } from "./contexts/AuthProvider";
-import { SnackbarProvider } from "./contexts/SnackbarProvider";
+import SnackbarProvider from "./contexts/SnackbarProvider";
+import HomeIcon from "@mui/icons-material/Home";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import { ReactRouterAppProvider } from "@toolpad/core/react-router";
+import type { Branding, Navigation } from "@toolpad/core";
+import Logo from "./components/Logo";
+import AuthProvider from "./contexts/AuthProvider";
 
-function App() {
+const NAVIGATION: Navigation = [
+  {
+    title: "Home",
+    icon: <HomeIcon />,
+  },
+  {
+    segment: "profile",
+    title: "My Profile",
+    icon: <AccountCircle />,
+  },
+];
+
+const BRANDING: Branding = {
+  title: "",
+  logo: <Logo />,
+};
+
+export default function App() {
   return (
-    <BrowserRouter>
+    <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING}>
       <AuthProvider>
         <SnackbarProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline enableColorScheme />
-            <AppRoutes />
+            <Outlet />
           </ThemeProvider>
         </SnackbarProvider>
       </AuthProvider>
-    </BrowserRouter>
+    </ReactRouterAppProvider>
   );
 }
-
-export default App;
