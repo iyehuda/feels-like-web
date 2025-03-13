@@ -1,8 +1,12 @@
 import { AlertColor, Snackbar, Alert } from "@mui/material";
-import { useState } from "react";
-import { SnackbarProviderProps, SnackbarContext } from "./SnackbarContext";
+import { ReactNode, useState } from "react";
+import { SnackbarContext } from "./SnackbarContext";
 
-export function SnackbarProvider({ children }: SnackbarProviderProps) {
+interface SnackbarProviderProps {
+  children: ReactNode;
+}
+
+export default function SnackbarProvider({ children }: SnackbarProviderProps) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [severity, setSeverity] = useState<AlertColor>("info");
