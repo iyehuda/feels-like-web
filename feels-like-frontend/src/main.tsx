@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage.tsx";
 import MyProfilePage from "./pages/MyProfilePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import SignupPage from "./pages/SignupPage.tsx";
+import ViewPostPage from "./pages/ViewPostPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
           {
             path: "profile",
             Component: MyProfilePage,
+          },
+          {
+            path: "posts/:id",
+            Component: ViewPostPage,
           },
         ],
       },

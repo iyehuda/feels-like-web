@@ -10,6 +10,8 @@ import morgan from "morgan";
 import authRouter from "./routes/auth";
 import userRouter from "./routes/users";
 import { authMiddleware } from "./controllers/auth";
+import postRouter from "./routes/posts";
+import commentRouter from "./routes/comments";
 
 const apiSpecs = swaggerJSDoc({
   apis: ["src/routes/*.ts"],
@@ -39,6 +41,8 @@ export function createApp() {
   app.use(`/${uploadsDir}`, express.static(uploadsDir));
   app.use("/auth", authRouter);
   app.use("/users", authMiddleware, userRouter);
+  app.use("/posts", authMiddleware, postRouter);
+  app.use("/comments", authMiddleware, commentRouter);
   app.use(errors());
   app.use(errorHandler({ includeStack: environment === Environment.DEV }));
 

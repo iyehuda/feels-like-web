@@ -3,7 +3,9 @@ import { getBackendUrl } from "../utils/api";
 import { User } from "../hooks/useUser";
 import { getSize, Size } from "../utils/sizes";
 
-export default function UserAvatar({ size = "medium", user }: { size?: Size; user: User }) {
+export type UserAvatarProps = { size?: Size; user: User };
+
+export default function UserAvatar({ size = "medium", user }: UserAvatarProps) {
   const imageSize = getSize(size);
 
   return (
