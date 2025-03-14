@@ -15,15 +15,17 @@ import { createApp } from "../src/app";
 import request from "supertest";
 
 let auth: AuthResponse;
-let teardown: Teardown;
+const teardown = new Teardown();
 let testUserDoc: HydratedDocument<IUser>;
 const app = createApp();
 
 beforeAll(async () => {
   const { dbConnectionString, closeDatabase } = await createDatabase();
-  teardown = closeDatabase;
+  teardown.add(closeDatabase);
 
   await connect(dbConnectionString);
+  teardown.add(disconnect);
+
   await User.deleteMany({});
 
   const authResponse = await signupUser(app, {
@@ -37,8 +39,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await disconnect();
-  await teardown();
+  await teardown.run();
 });
 
 describe("GET /users/:id", () => {

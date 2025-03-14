@@ -5,20 +5,21 @@ import { createApp } from "../src/app";
 import request from "supertest";
 
 let auth: AuthResponse;
-let teardown: Teardown;
+const teardown = new Teardown();
 const app = createApp();
 
 beforeAll(async () => {
   const { dbConnectionString, closeDatabase } = await createDatabase();
-  teardown = closeDatabase;
+  teardown.add(closeDatabase);
 
   await connect(dbConnectionString);
+  teardown.add(disconnect);
+
   await User.deleteMany({});
 });
 
 afterAll(async () => {
-  await disconnect();
-  await teardown();
+  await teardown.run();
 });
 
 function expectAuthResponse(response: object) {

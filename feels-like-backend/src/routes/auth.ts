@@ -31,10 +31,10 @@ const minPasswordLength = 6;
  *     SignupRequest:
  *       type: object
  *       required:
- *         - fullName
- *         - email
- *         - password
- *         - avatar
+ *       - fullName
+ *       - email
+ *       - password
+ *       - avatar
  *       properties:
  *         fullName:
  *           type: string
@@ -45,10 +45,10 @@ const minPasswordLength = 6;
  *         password:
  *           type: string
  *           description: The user password
- *         #avatar:
- *         #  type: string
- *         #  format: binary
- *         #  description: User avatar file
+ *         avatar:
+ *           type: string
+ *           format: binary
+ *           description: User avatar file
  *
  *     LoginRequest:
  *       type: object

@@ -1,28 +1,10 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
-import useAuth from "../hooks/useAuth";
-import useUser from "../hooks/useUser";
+import { Box } from "@mui/material";
 import LogoutButton from "./LogoutButton";
-import UserAvatar from "./UserAvatar";
+import UserDetails from "./UserDetails";
+import useAuth from "../hooks/useAuth";
 
 export default function SidebarFooter() {
   const { userId } = useAuth();
-  const { user, isLoading, error } = useUser(userId);
-
-  if (isLoading) {
-    return (
-      <Box display="flex" justifyContent="center" my={2}>
-        <CircularProgress size={40} />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return <Typography color="error">Error loading user data</Typography>;
-  }
-
-  if (!user) {
-    return null;
-  }
 
   return (
     <Box
@@ -35,20 +17,7 @@ export default function SidebarFooter() {
         justifyContent: "space-between",
       }}
     >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
-        <UserAvatar user={user} />
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Typography variant="h6">{user.fullName}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            {user.email}
-          </Typography>
-        </Box>
-      </Box>
+      {userId && <UserDetails userId={userId} />}
       <LogoutButton />
     </Box>
   );
