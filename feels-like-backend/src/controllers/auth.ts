@@ -82,6 +82,9 @@ async function getUserByRefreshToken(refreshToken: string): Promise<HydratedDocu
     throw new Error(`User ${user.id} does not have refresh token ${refreshToken}`);
   }
 
+  user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
+  await user.save();
+
   return user;
 }
 
@@ -128,9 +131,8 @@ export async function login(req: Request, res: Response) {
 export async function logout(req: Request, res: Response) {
   const { refreshToken } = req.body;
   try {
-    const user = await getUserByRefreshToken(refreshToken);
-    user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
-    await user.save();
+    await getUserByRefreshToken(refreshToken);
+
     res.status(200).send("success");
   } catch (err) {
     console.error("Failed to verify refresh token", err);

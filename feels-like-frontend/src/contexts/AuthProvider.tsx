@@ -1,12 +1,12 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import * as authService from "../services/auth";
 import {
   AuthInfo,
+  clearStoredAuthInfo,
   getStoredAuthInfo,
-  emptyAuthState,
-  saveAuthInfo,
-  clearAuthInfo,
+  isAuthenticated,
+  setStoredAuthInfo,
 } from "../storage/auth";
 
 interface AuthProviderProps {
@@ -15,23 +15,30 @@ interface AuthProviderProps {
 
 export default function AuthProvider({ children }: AuthProviderProps) {
   const [authState, setAuthState] = useState<AuthInfo>(getStoredAuthInfo);
-  const isAuthenticated = !!authState.accessToken;
+
+  const reloadAuthInfo = useCallback(() => {
+    setAuthState(getStoredAuthInfo());
+  }, [setAuthState]);
+
+  useEffect(() => {
+    window.addEventListener("storage", reloadAuthInfo);
+
+    return () => {
+      window.removeEventListener("storage", reloadAuthInfo);
+    };
+  }, [reloadAuthInfo]);
 
   const setAuthInfo = (authInfo: AuthInfo) => {
-    setAuthState(authInfo);
-    saveAuthInfo(authInfo);
+    setStoredAuthInfo(authInfo);
   };
 
   const logout = async () => {
     try {
-      if (authState.refreshToken) {
-        await authService.logout(authState.refreshToken!);
-      }
+      await authService.logout();
     } catch (error) {
       console.error("Failed to logout", error);
     } finally {
-      setAuthState(emptyAuthState);
-      clearAuthInfo();
+      clearStoredAuthInfo();
     }
   };
 
@@ -43,7 +50,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         userId: authState.userId,
         setAuthInfo,
         logout,
-        isAuthenticated,
+        isAuthenticated: isAuthenticated(),
       }}
     >
       {children}

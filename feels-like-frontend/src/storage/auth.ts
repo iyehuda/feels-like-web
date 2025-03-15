@@ -4,9 +4,13 @@ export interface AuthInfo {
   userId: string | undefined;
 }
 
-const LOCAL_STORAGE_AUTH_KEY = "auth_info";
+const AUTH_STORAGE_KEY = "auth_info";
 
-export function emptyAuthState() {
+function notifyChange() {
+  window.dispatchEvent(new Event("storage"));
+}
+
+function emptyAuthState() {
   return {
     accessToken: undefined,
     refreshToken: undefined,
@@ -15,21 +19,30 @@ export function emptyAuthState() {
 }
 
 export function getStoredAuthInfo(): AuthInfo {
-  const savedAuth = localStorage.getItem(LOCAL_STORAGE_AUTH_KEY);
-  if (savedAuth) {
-    try {
-      return JSON.parse(savedAuth);
-    } catch (error) {
-      console.error("Failed to parse auth info from local storage", error);
-    }
+  const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+  if (!stored) {
+    return emptyAuthState();
   }
-  return emptyAuthState();
+
+  try {
+    return JSON.parse(stored) as AuthInfo;
+  } catch (error) {
+    console.error("Failed to parse auth info from local storage", error);
+    return emptyAuthState();
+  }
 }
 
-export function saveAuthInfo(authInfo: AuthInfo) {
-  localStorage.setItem(LOCAL_STORAGE_AUTH_KEY, JSON.stringify(authInfo));
+export function setStoredAuthInfo(authInfo: AuthInfo) {
+  localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authInfo));
+  notifyChange();
 }
 
-export function clearAuthInfo() {
-  localStorage.removeItem(LOCAL_STORAGE_AUTH_KEY);
+export function clearStoredAuthInfo() {
+  localStorage.removeItem(AUTH_STORAGE_KEY);
+  notifyChange();
+}
+
+export function isAuthenticated(): boolean {
+  const { accessToken } = getStoredAuthInfo();
+  return !!accessToken;
 }
