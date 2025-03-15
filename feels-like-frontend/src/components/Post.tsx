@@ -8,6 +8,8 @@ import Comment from "./Comment";
 import AddComment from "./AddComment";
 import PostImage from "./PostImage";
 import LikeButton from "./LikeButton";
+import { useCallback } from "react";
+import useAuth from "../hooks/useAuth";
 
 interface PostProps {
   postId: EntityID;
@@ -16,7 +18,19 @@ interface PostProps {
 
 export default function Post({ postId, showComments = false }: PostProps) {
   const { post, error: postError, isLoading: postLoading } = usePost(postId);
-  const { comments, error: commentsError, isLoading: commentsLoading } = usePostComments(postId);
+  const {
+    comments,
+    error: commentsError,
+    isLoading: commentsLoading,
+    mutate: mutateComments,
+  } = usePostComments(postId);
+  const { userId } = useAuth();
+  const handleCommentAdded = useCallback(
+    (comment: string) => {
+      mutateComments([...comments, { author: userId!, content: comment, id: "new", post: postId }]);
+    },
+    [comments, mutateComments, postId, userId],
+  );
 
   if (postLoading || commentsLoading) {
     return <Typography>Loading...</Typography>;
@@ -59,7 +73,7 @@ export default function Post({ postId, showComments = false }: PostProps) {
                 <Comment comment={comment} />
               ))}
               <Divider sx={{ my: 2 }} />
-              <AddComment postId={postId} />
+              <AddComment postId={postId} onCommentAdded={handleCommentAdded} />
             </>
           )}
         </Box>
