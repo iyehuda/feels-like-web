@@ -66,6 +66,17 @@ const minPasswordLength = 6;
  *         email: 'bob@gmail.com'
  *         password: '123456'
  *
+ *     GoogleLoginRequest:
+ *       type: object
+ *       required:
+ *         - credential
+ *       properties:
+ *         credential:
+ *           type: string
+ *           description: Google ID token
+ *       example:
+ *         credential: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjkxNGZiOWIwOD...'
+ *
  *     AuthResponse:
  *       type: object
  *       required:
@@ -172,6 +183,39 @@ const loginRequestSchema = {
   }),
 };
 authRouter.post("/login", celebrate(loginRequestSchema), authController.login);
+
+/**
+ * @swagger
+ * /auth/google:
+ *   post:
+ *     summary: Google login
+ *     description: Authenticate user with google and return tokens
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/GoogleLoginRequest'
+ *     responses:
+ *       200:
+ *         description: The user id and auth tokens
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       400:
+ *         description: Invalid request
+ *       401:
+ *         description: Invalid credentials
+ */
+const googleRequestSchema = {
+  [Segments.BODY]: Joi.object({
+    credential: Joi.string().required(),
+  }),
+};
+authRouter.post("/google", celebrate(googleRequestSchema), authController.googleSignin);
 
 /**
  * @swagger

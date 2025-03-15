@@ -1,6 +1,19 @@
 import multer from "multer";
 import { Environment, environment, uploadsDir } from "../config";
 import { mkdirSync, rmSync } from "node:fs";
+import path from "node:path";
+
+function createFilename(originalName: string): string {
+  const radix = 36;
+  const trimLength = 2;
+  const randomName = Math.random().toString(radix).substring(trimLength);
+  const originalSuffix = originalName.split(".").pop();
+  return `${randomName}.${originalSuffix}`;
+}
+
+export function getFilePath(): string {
+  return path.join(uploadsDir, createFilename(".png"));
+}
 
 export default multer({
   storage: multer.diskStorage({
@@ -14,11 +27,7 @@ export default multer({
       callback(null, uploadsDir);
     },
     filename(_req, file, callback) {
-      const radix = 36;
-      const trimLength = 2;
-      const randomName = Math.random().toString(radix).substring(trimLength);
-      const originalSuffix = file.originalname.split(".").pop();
-      callback(null, `${randomName}.${originalSuffix}`);
+      callback(null, createFilename(file.originalname));
     },
   }),
 });

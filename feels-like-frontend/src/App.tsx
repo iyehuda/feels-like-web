@@ -8,6 +8,8 @@ import { ReactRouterAppProvider } from "@toolpad/core/react-router";
 import type { Branding, Navigation } from "@toolpad/core";
 import Logo from "./components/Logo";
 import AuthProvider from "./contexts/AuthProvider";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { API_CONFIG } from "./config/api";
 
 const NAVIGATION: Navigation = [
   {
@@ -29,14 +31,16 @@ const BRANDING: Branding = {
 export default function App() {
   return (
     <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING}>
-      <AuthProvider>
-        <SnackbarProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline enableColorScheme />
-            <Outlet />
-          </ThemeProvider>
-        </SnackbarProvider>
-      </AuthProvider>
+      <GoogleOAuthProvider clientId={API_CONFIG.googleClientId}>
+        <AuthProvider>
+          <SnackbarProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline enableColorScheme />
+              <Outlet />
+            </ThemeProvider>
+          </SnackbarProvider>
+        </AuthProvider>
+      </GoogleOAuthProvider>
     </ReactRouterAppProvider>
   );
 }
