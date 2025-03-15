@@ -15,11 +15,13 @@ export default function usePostComments(postId?: EntityID) {
     data: comments,
     error,
     isLoading,
+    mutate,
   } = useSWR<PostComment[], AxiosError>(postId ? `/comments?post=${postId}` : null, fetcher);
 
   return {
     comments: comments || [],
     error,
     isLoading,
+    mutate,
   };
 }
