@@ -1,4 +1,5 @@
 import { apiClient } from "./fetcher";
+import { clearStoredAuthInfo, getStoredAuthInfo, setStoredAuthInfo } from "../storage/auth";
 
 interface SignupData {
   fullName: string;
@@ -7,7 +8,7 @@ interface SignupData {
   avatar: File;
 }
 
-interface AuthResponse {
+export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   userId: string;
@@ -35,8 +36,36 @@ export async function login(email: string, password: string): Promise<AuthRespon
   return data;
 }
 
-export async function logout(refreshToken: string): Promise<void> {
-  await apiClient.post("/auth/logout", {
-    refreshToken,
-  });
+export async function logout(): Promise<void> {
+  const { refreshToken } = getStoredAuthInfo();
+  clearStoredAuthInfo();
+
+  if (refreshToken) {
+    await apiClient.post("/auth/logout", {
+      refreshToken,
+    });
+  }
+}
+
+export async function refreshToken(): Promise<boolean> {
+  try {
+    const { refreshToken } = getStoredAuthInfo();
+
+    if (!refreshToken) {
+      return false;
+    }
+
+    const { data: auth } = await apiClient.post<AuthResponse>("/auth/refresh", {
+      refreshToken,
+    });
+
+    if (auth) {
+      setStoredAuthInfo(auth);
+      return true;
+    }
+  } catch (error) {
+    console.error("Failed to refresh token:", error);
+  }
+
+  return false;
 }
