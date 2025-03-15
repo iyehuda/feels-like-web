@@ -2,16 +2,47 @@ import { Box, Button, Container, Typography, CircularProgress } from "@mui/mater
 import { useNavigate } from "react-router-dom";
 import usePosts from "../hooks/usePosts";
 import Post from "../components/Post";
+import { useEffect, useCallback, useState } from "react";
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { posts, error, isLoading, isValidating, hasMore, loadMore } = usePosts();
+  const [scrollContainer, setScrollContainer] = useState<HTMLElement | null>(null);
 
-  // Fetch all posts
-  const { posts, error, isLoading } = usePosts();
+
+  useEffect(() => {
+    setTimeout(() => {
+      // Detecting the correct scroll container
+      const detectedContainer = document.querySelector(".MuiContainer-root");
+      setScrollContainer(detectedContainer as HTMLElement);
+
+    }, 500);
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    if (!scrollContainer) return;
+
+    const scrollTop = scrollContainer.scrollTop;
+    const windowHeight = scrollContainer.clientHeight;
+    const docHeight = scrollContainer.scrollHeight;
+
+    console.log("Scroll Debug:", { scrollTop, windowHeight, docHeight, hasMore, isValidating });
+
+    if (scrollTop + windowHeight >= docHeight - 100 && hasMore && !isValidating) {
+      console.log("Triggering loadMore() automatically");
+      loadMore();
+    }
+  }, [scrollContainer, hasMore, isValidating, loadMore]);
+
+  useEffect(() => {
+    if (!scrollContainer) return;
+
+    scrollContainer.addEventListener("scroll", handleScroll);
+    return () => scrollContainer.removeEventListener("scroll", handleScroll);
+  }, [scrollContainer, handleScroll]);
 
   return (
-    <Container maxWidth="md">
-      {/* Weather & Clothing Recommendation Section */}
+    <Container maxWidth="md" className="scroll-container">
       <Box
         sx={{
           backgroundColor: "#1976d2",
@@ -45,10 +76,16 @@ export default function HomePage() {
           </Box>
         )}
         {error && <Typography color="error">Failed to load posts</Typography>}
-        {posts &&
-          posts.map((post) => (
-            <Post key={post.id} postId={post.id} showComments={false} />
-          ))}
+        {posts.map((post) => (
+          <Post key={post.id} postId={post.id} showComments={false} />
+        ))}
+
+        {/* Loading More Indicator */}
+        {isValidating && (
+          <Box display="flex" justifyContent="center" mt={2}>
+            <CircularProgress size={30} />
+          </Box>
+        )}
       </Box>
 
       {/* Floating "Add New Post" Button */}

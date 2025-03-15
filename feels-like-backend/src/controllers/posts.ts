@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import Post, { IPost } from "../models/post";
 import BaseController, { DBHandler } from "./base-controller";
 import { BadRequest, Forbidden, NotFound } from "http-errors";
-import { HydratedDocument, RootFilterQuery } from "mongoose";
+import { HydratedDocument } from "mongoose";
 import { unlink } from "node:fs/promises";
 
 export interface PostResponse {
   author: string;
   content: string;
+  createdAt: Date;
   id: string;
   image: string;
   likedByMe: boolean;
@@ -18,6 +19,7 @@ function postResponse(item: HydratedDocument<IPost>): PostResponse {
   return {
     author: item.author.toString(),
     content: item.content,
+    createdAt: item.createdAt,
     id: item.id,
     image: item.image,
     likedByMe: false,
@@ -59,9 +61,36 @@ export default class PostsController extends BaseController<IPost> {
 
   @DBHandler
   async getItems(req: Request, res: Response) {
-    const items = await this.model.find(req.query as RootFilterQuery<IPost>);
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
+      const skip = (page - 1) * limit;
 
-    res.json(items.map(postResponse));
+      const filter: any = {};
+
+      if (req.query.author) {
+        filter.author = req.query.author;
+      }
+
+      const totalPosts = await this.model.countDocuments(filter);
+      const totalPages = Math.ceil(totalPosts / limit);
+
+      const items = await this.model
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec();
+
+      res.status(200).json({
+        currentPage: page,
+        posts: items.map(postResponse),
+        totalPages,
+      });
+    } catch (error) {
+      console.error("Error fetching paginated posts:", error);
+      res.status(500).json({ message: "Failed to fetch posts" });
+    }
   }
 
   @DBHandler
