@@ -12,6 +12,7 @@ dotenv.config();
 const defaults = {
   DB_CONNECTION_STRING: "mongodb://localhost/FeelsLike?authSource=admin",
   ENVIRONMENT: Environment.DEV,
+  GOOGLE_CLIENT_ID: "672265150652-k52ou841kgciope4a7qsabp595km9jhv.apps.googleusercontent.com",
   PORT: 3000,
   REFRESH_TOKEN_EXPIRES: "7d",
   TOKEN_EXPIRES: "1h",
@@ -23,6 +24,7 @@ const defaults = {
 
 export const dbConnectionString = process.env.DB_CONNECTION_STRING ?? defaults.DB_CONNECTION_STRING;
 export const environment = (process.env.NODE_ENV as Environment) ?? defaults.ENVIRONMENT;
+export const googleClientId = process.env.GOOGLE_CLIENT_ID ?? defaults.GOOGLE_CLIENT_ID;
 export const port = process.env.PORT ?? defaults.PORT;
 export const tokenSecret: Secret = process.env.TOKEN_SECRET ?? defaults.TOKEN_SECRET;
 export const tokenExpires = (process.env.TOKEN_EXPIRES ?? defaults.TOKEN_EXPIRES) as StringValue;

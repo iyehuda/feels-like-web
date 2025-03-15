@@ -22,15 +22,23 @@ export async function signup(userData: SignupData): Promise<AuthResponse> {
   form.append("password", userData.password);
   form.append("avatar", userData.avatar);
 
-  const { data } = await apiClient.post("/auth/signup", form);
+  const { data } = await apiClient.post<AuthResponse>("/auth/signup", form);
 
   return data;
 }
 
 export async function login(email: string, password: string): Promise<AuthResponse> {
-  const { data } = await apiClient.post("/auth/login", {
+  const { data } = await apiClient.post<AuthResponse>("/auth/login", {
     email,
     password,
+  });
+
+  return data;
+}
+
+export async function continueWithGoogle(credential: string): Promise<AuthResponse> {
+  const { data } = await apiClient.post<AuthResponse>("/auth/google", {
+    credential,
   });
 
   return data;

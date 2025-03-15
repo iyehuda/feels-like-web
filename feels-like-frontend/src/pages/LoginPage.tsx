@@ -7,8 +7,10 @@ import FormFooter from "../components/FormFooter";
 import FormSubmitButton from "../components/FormSubmitButton";
 import FormTextField from "../components/FormTextField";
 import FormLayout from "../layouts/FormLayout";
-import { login } from "../services/auth";
+import { continueWithGoogle, login } from "../services/auth";
 import StandalonePageLayout from "../layouts/StandalonePageLayout";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import { CircularProgress, Divider } from "@mui/material";
 
 type LoginInputs = {
   email: string;
@@ -20,6 +22,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const {
     handleSubmit,
@@ -43,6 +46,29 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const onGoogleLoginSuccess = async (response: CredentialResponse) => {
+    console.log(response);
+    setIsGoogleLoading(true);
+    try {
+      const authResponse = await continueWithGoogle(response.credential!);
+      setAuthInfo(authResponse);
+      showSnackbar("Welcome!", "success");
+      navigate("/");
+    } catch (error) {
+      console.error("Failed to login with Google:", error);
+      showSnackbar(
+        error instanceof Error ? error.message : "Failed to login with Google.",
+        "error",
+      );
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  const onGoogleLoginError = () => {
+    console.error("Failed to login with Google");
   };
 
   return (
@@ -94,6 +120,23 @@ export default function LoginPage() {
           </FormFooter>
         </form>
       </FormLayout>
+      <Divider />
+      <Divider variant="fullWidth" sx={{ my: 2 }}>
+        or
+      </Divider>
+      {isGoogleLoading ? (
+        <CircularProgress size={24} color="inherit" />
+      ) : (
+        <GoogleLogin
+          locale="en"
+          size="large"
+          width={400}
+          shape="square"
+          logo_alignment="left"
+          onSuccess={onGoogleLoginSuccess}
+          onError={onGoogleLoginError}
+        />
+      )}
     </StandalonePageLayout>
   );
 }

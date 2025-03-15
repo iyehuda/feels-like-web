@@ -3,9 +3,15 @@ import User, { IUser } from "../models/user";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { HydratedDocument } from "mongoose";
-import { refreshTokenExpires, tokenExpires, tokenSecret } from "../config";
+import { googleClientId, refreshTokenExpires, tokenExpires, tokenSecret } from "../config";
 import { BadRequest, Conflict, Unauthorized } from "http-errors";
 import { StringValue } from "ms";
+import { OAuth2Client, TokenPayload as GoogleToken } from "google-auth-library";
+import download from "image-downloader";
+import { getFilePath } from "../utils/upload";
+import path from "path";
+
+const googleClient = new OAuth2Client();
 
 interface Tokens {
   accessToken: string;
@@ -126,6 +132,58 @@ export async function login(req: Request, res: Response) {
     userId: user._id,
     ...tokens,
   });
+}
+
+async function downloadAvatar(url: string): Promise<string> {
+  const filename = getFilePath();
+  const fullPath = path.join(process.cwd(), filename);
+  await download.image({ dest: fullPath, url });
+
+  return filename;
+}
+
+async function createUserFromGoogle(token: GoogleToken): Promise<HydratedDocument<IUser>> {
+  const { email, name: fullName, picture } = token;
+  const avatar = await downloadAvatar(picture!);
+
+  return User.create({
+    avatar,
+    email: email!,
+    fullName,
+  });
+}
+
+async function getOrCreateUserFromGoogle(token: GoogleToken): Promise<HydratedDocument<IUser>> {
+  const { email } = token;
+
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    user = await createUserFromGoogle(token);
+  }
+
+  return user;
+}
+
+export async function googleSignin(req: Request, res: Response) {
+  const { credential } = req.body;
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      audience: googleClientId,
+      idToken: credential,
+    });
+    const payload = ticket.getPayload();
+    const user = await getOrCreateUserFromGoogle(payload!);
+    const tokens = await generateTokens(user);
+
+    res.status(200).send({
+      userId: user._id,
+      ...tokens,
+    });
+  } catch (err) {
+    throw Unauthorized((err as Error).message);
+  }
 }
 
 export async function logout(req: Request, res: Response) {
