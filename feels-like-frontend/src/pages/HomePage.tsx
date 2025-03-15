@@ -2,47 +2,38 @@ import { Box, Button, Container, Typography, CircularProgress } from "@mui/mater
 import { useNavigate } from "react-router-dom";
 import usePosts from "../hooks/usePosts";
 import Post from "../components/Post";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useRef } from "react";
 
 export default function HomePage() {
   const navigate = useNavigate();
   const { posts, error, isLoading, isValidating, hasMore, loadMore } = usePosts();
-  const [scrollContainer, setScrollContainer] = useState<HTMLElement | null>(null);
-
-
-  useEffect(() => {
-    setTimeout(() => {
-      // Detecting the correct scroll container
-      const detectedContainer = document.querySelector(".MuiContainer-root");
-      setScrollContainer(detectedContainer as HTMLElement);
-
-    }, 500);
-  }, []);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   const handleScroll = useCallback(() => {
-    if (!scrollContainer) return;
+    if (!scrollContainerRef.current) return;
 
-    const scrollTop = scrollContainer.scrollTop;
-    const windowHeight = scrollContainer.clientHeight;
-    const docHeight = scrollContainer.scrollHeight;
+    const scrollTop = scrollContainerRef.current.scrollTop;
+    const containerHeight = scrollContainerRef.current.clientHeight;
+    const contentHeight = scrollContainerRef.current.scrollHeight;
 
-    console.log("Scroll Debug:", { scrollTop, windowHeight, docHeight, hasMore, isValidating });
+    console.log("Scroll Debug:", { scrollTop, containerHeight, contentHeight, hasMore, isValidating });
 
-    if (scrollTop + windowHeight >= docHeight - 100 && hasMore && !isValidating) {
+    if (scrollTop + containerHeight >= contentHeight - 50 && hasMore && !isValidating) {
       console.log("Triggering loadMore() automatically");
       loadMore();
     }
-  }, [scrollContainer, hasMore, isValidating, loadMore]);
+  }, [hasMore, isValidating, loadMore]);
 
   useEffect(() => {
-    if (!scrollContainer) return;
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-    scrollContainer.addEventListener("scroll", handleScroll);
-    return () => scrollContainer.removeEventListener("scroll", handleScroll);
-  }, [scrollContainer, handleScroll]);
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   return (
-    <Container maxWidth="md" className="scroll-container">
+    <Container maxWidth="md">
       <Box
         sx={{
           backgroundColor: "#1976d2",
@@ -68,8 +59,26 @@ export default function HomePage() {
         </Box>
       </Box>
 
-      {/* Post Feed */}
-      <Box mt={4}>
+      {/* Scrollable Post Feed */}
+      <Box
+        ref={scrollContainerRef} // Attach ref here
+        mt={4}
+        sx={{
+          height: "500px", // Needed to enable scrolling
+          overflowY: "auto", // Enables vertical scrolling
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          padding: "16px",
+          '&::-webkit-scrollbar': {
+            WebkitAppearance: 'none',
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            borderRadius: '8px',
+            backgroundColor: 'gray',
+          },
+        }}
+      >
         {isLoading && (
           <Box display="flex" justifyContent="center">
             <CircularProgress />
@@ -86,6 +95,7 @@ export default function HomePage() {
             <CircularProgress size={30} />
           </Box>
         )}
+        <Button onClick={loadMore}>Load More</Button>
       </Box>
 
       {/* Floating "Add New Post" Button */}
