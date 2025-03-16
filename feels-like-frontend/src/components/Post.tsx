@@ -1,4 +1,4 @@
-import { Box, Container, Divider, Paper, Typography } from "@mui/material";
+import { Box, Container, Divider, Paper, Typography, CircularProgress } from "@mui/material";
 import { EntityID } from "../utils/api";
 import usePost from "../hooks/usePost";
 import UserDetails from "./UserDetails";
@@ -8,9 +8,11 @@ import Comment from "./Comment";
 import AddComment from "./AddComment";
 import PostImage from "./PostImage";
 import LikeButton from "./LikeButton";
-import { useCallback } from "react";
+import { useCallback, useRef, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { PostComment } from "../hooks/usePostComments";
+import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 
 interface PostProps {
   postId: EntityID;
@@ -24,14 +26,25 @@ export default function Post({ postId, showComments = false }: PostProps) {
     comments,
     error: commentsError,
     isLoading: commentsLoading,
-    mutate: mutateComments,
+    addComment,
+    totalComments,
+    hasMore,
+    isLoadingMore,
+    loadMore,
   } = usePostComments(postId);
   const { userId } = useAuth();
+
+  const loaderRef = useInfiniteScroll({
+    hasMore: Boolean(hasMore),
+    isLoading: Boolean(isLoadingMore),
+    onLoadMore: loadMore,
+  });
+
   const handleCommentAdded = useCallback(
-    (comment: string) => {
-      mutateComments([...comments, { author: userId!, content: comment, id: "new", post: postId }]);
+    (comment: PostComment) => {
+      addComment(comment);
     },
-    [comments, mutateComments, postId, userId],
+    [addComment]
   );
 
   const handleClick = (e: React.MouseEvent) => {
@@ -51,7 +64,6 @@ export default function Post({ postId, showComments = false }: PostProps) {
 
   if (postError || commentsError) {
     console.error({ postError, commentsError });
-
     return <Typography>Error loading post</Typography>;
   }
 
@@ -87,15 +99,22 @@ export default function Post({ postId, showComments = false }: PostProps) {
             </Box>
             <Box display={"flex"} flexDirection={"row"}>
               <SmsOutlinedIcon sx={{ mr: 1 }} />
-              <Typography>{comments.length} Comments</Typography>
+              <Typography>{totalComments} Comments</Typography>
             </Box>
           </Box>
           {showComments && (
             <>
               {comments.length > 0 && <Divider sx={{ my: 2 }} />}
-              {comments.map((comment) => (
-                <Comment comment={comment} />
-              ))}
+              <Box sx={{ maxHeight: showComments ? '400px' : 'auto', overflowY: 'auto' }}>
+                {comments.map((comment) => (
+                  <Comment key={comment.id} comment={comment} />
+                ))}
+                {hasMore && (
+                  <Box ref={loaderRef} display="flex" justifyContent="center" my={2}>
+                    <CircularProgress size={24} />
+                  </Box>
+                )}
+              </Box>
               <Divider sx={{ my: 2 }} />
               <AddComment postId={postId} onCommentAdded={handleCommentAdded} />
             </>
