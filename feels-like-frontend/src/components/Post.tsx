@@ -10,6 +10,7 @@ import PostImage from "./PostImage";
 import LikeButton from "./LikeButton";
 import { useCallback } from "react";
 import useAuth from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 interface PostProps {
   postId: EntityID;
@@ -17,6 +18,7 @@ interface PostProps {
 }
 
 export default function Post({ postId, showComments = false }: PostProps) {
+  const navigate = useNavigate();
   const { post, error: postError, isLoading: postLoading } = usePost(postId);
   const {
     comments,
@@ -31,6 +33,17 @@ export default function Post({ postId, showComments = false }: PostProps) {
     },
     [comments, mutateComments, postId, userId],
   );
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent navigation if clicking on interactive elements
+    if (
+      (e.target as HTMLElement).closest('button') ||
+      showComments // Don't navigate if we're already in the post view
+    ) {
+      return;
+    }
+    navigate(`/posts/${postId}`);
+  };
 
   if (postLoading || commentsLoading) {
     return <Typography>Loading...</Typography>;
@@ -48,7 +61,18 @@ export default function Post({ postId, showComments = false }: PostProps) {
 
   return (
     <Container maxWidth="md">
-      <Paper variant="outlined" sx={{ padding: 2, borderRadius: 8 }}>
+      <Paper 
+        variant="outlined" 
+        sx={{ 
+          padding: 2, 
+          borderRadius: 8,
+          cursor: showComments ? 'default' : 'pointer',
+          '&:hover': {
+            backgroundColor: showComments ? 'transparent' : 'action.hover'
+          }
+        }}
+        onClick={handleClick}
+      >
         <UserDetails userId={post.author} />
         <Divider sx={{ mt: 2 }} />
         <Box padding={3}>

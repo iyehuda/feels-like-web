@@ -35,9 +35,12 @@ export default function Comment({ comment }: { comment: PostComment }) {
         sx={{
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#f0f0f0",
-          borderRadius: 5,
+          backgroundColor: "action.hover",
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
           width: "100%",
+          ml: 2,
           paddingY: 1,
           paddingX: 2,
         }}
