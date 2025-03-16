@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import fetcher from "../services/fetcher";
 import { Post } from "./usePost";
 
-const PAGE_SIZE = 1; // For debugging, set limit to 1
+const PAGE_SIZE = 10; // Increased from 1 to 10 posts per page
 
 export default function usePosts() {
   const getKey = (pageIndex: number, previousPageData: { posts: Post[]; totalPages: number; currentPage: number } | null) => {
@@ -26,7 +26,15 @@ export default function usePosts() {
   const lastPage = data ? data[data.length - 1] : null;
   const currentPage = lastPage?.currentPage || 1;
   const totalPages = lastPage?.totalPages || 1;
-  const hasMore = currentPage < totalPages; // Fix: Compare currentPage, not size
+  const hasMore = currentPage < totalPages;
+
+  console.log("usePosts Debug:", {
+    currentPage,
+    totalPages,
+    hasMore,
+    postsCount: posts.length,
+    isValidating
+  });
 
   return {
     posts,
@@ -36,8 +44,13 @@ export default function usePosts() {
     hasMore,
     loadMore: () => {
       if (hasMore && !isValidating) {
-        console.log(`Loading more posts... Current Page: ${currentPage}, Total Pages: ${totalPages}`);
-        setSize(size + 1).catch((error) => console.error("Failed to load more posts:", error));
+        console.log(`Loading more posts... Current Page: ${currentPage}, Total Pages: ${totalPages}, Current Size: ${size}`);
+        // Force a size increase to load the next page
+        setSize(size + 1)
+          .then(() => console.log("Successfully increased size to", size + 1))
+          .catch((error) => console.error("Failed to load more posts:", error));
+      } else {
+        console.log("Cannot load more:", { hasMore, isValidating, currentPage, totalPages });
       }
     },
   };
