@@ -49,15 +49,15 @@ const controller = new PostsController();
  *     PostResponse:
  *       type: object
  *       properties:
+ *         id:
+ *           type: string
+ *           description: The post ID
  *         author:
  *           type: string
  *           description: The post author user ID
  *         content:
  *           type: string
  *           description: The post content
- *         id:
- *           type: string
- *           description: The post ID
  *         image:
  *           type: string
  *           description: The post image relative path
@@ -67,14 +67,20 @@ const controller = new PostsController();
  *         likes:
  *           type: number
  *           description: The number of likes the post has
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: The timestamp when the post was created
  *       example:
+ *         id: "678978cff1f71e3b0dd7bb45"
  *         author: "6738b7b2944556561a86110a"
  *         content: "Hello, world!"
- *         id: "678978cff1f71e3b0dd7bb45"
  *         image: "uploads/678978cff1f71e3b0dd7bb45.jpg"
  *         likedByMe: false
  *         likes: 0
+ *         createdAt: "2024-03-15T12:00:00Z"
  */
+
 const newPostSchema = {
   [Segments.BODY]: Joi.object({
     content: Joi.string().required(),
@@ -83,6 +89,8 @@ const newPostSchema = {
 const getPostsSchema = {
   [Segments.QUERY]: Joi.object({
     author: Joi.string().custom(validObjectId).optional(),
+    limit: Joi.number().integer().min(1).max(50).optional(),
+    page: Joi.number().integer().min(1).optional(),
   }),
 };
 const updatePostSchema = {
@@ -95,7 +103,7 @@ const updatePostSchema = {
  * @swagger
  * /posts:
  *   get:
- *     summary: Get posts with optional filtering by author
+ *     summary: Get posts with optional filtering by author and pagination
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
@@ -105,15 +113,34 @@ const updatePostSchema = {
  *         schema:
  *           type: string
  *         description: Filter posts by author
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           description: The page number (default is 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           description: Number of posts per page (default is 10)
  *     responses:
  *       200:
- *         description: A list of posts
+ *         description: A paginated list of posts
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/PostResponse'
+ *               type: object
+ *               properties:
+ *                 posts:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/PostResponse'
+ *                 totalPages:
+ *                   type: integer
+ *                   description: Total number of pages
+ *                 currentPage:
+ *                   type: integer
+ *                   description: The current page number
  *       400:
  *         description: Invalid filters
  *   post:

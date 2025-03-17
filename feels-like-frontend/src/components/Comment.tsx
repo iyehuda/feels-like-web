@@ -9,7 +9,7 @@ export default function Comment({ comment }: { comment: PostComment }) {
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" my={2}>
-        <CircularProgress size={40} />
+        <CircularProgress size={24} />
       </Box>
     );
   }
@@ -27,7 +27,7 @@ export default function Comment({ comment }: { comment: PostComment }) {
       sx={{
         display: "flex",
         flexDirection: "row",
-        my: 2,
+        my: 1.5,
       }}
     >
       <UserAvatar size="small" user={user} />
@@ -35,14 +35,17 @@ export default function Comment({ comment }: { comment: PostComment }) {
         sx={{
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#f0f0f0",
-          borderRadius: 5,
+          backgroundColor: "action.hover",
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
           width: "100%",
+          ml: 2,
           paddingY: 1,
           paddingX: 2,
         }}
       >
-        <Typography variant="h6">{user.fullName}</Typography>
+        <Typography variant="subtitle2">{user.fullName}</Typography>
         <Typography variant="body2" color="text.secondary">
           {comment.content}
         </Typography>

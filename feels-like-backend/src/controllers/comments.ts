@@ -57,4 +57,38 @@ export default class CommentsController extends BaseController<IComment> {
 
     res.status(204).send();
   }
+
+  @DBHandler
+  async getItems(req: Request, res: Response) {
+    const { author, post, page = 1, limit = 10 } = req.query;
+    const filter: any = {};
+
+    if (author) {
+      filter.author = author;
+    }
+
+    if (post) {
+      filter.post = post;
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+    
+    const [items, total] = await Promise.all([
+      this.model
+        .find(filter)
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(Number(limit))
+        .exec(),
+      this.model.countDocuments(filter)
+    ]);
+
+    res.json({
+      items,
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      hasMore: skip + items.length < total
+    });
+  }
 }

@@ -76,6 +76,8 @@ const getCommentsSchema = {
   [Segments.QUERY]: Joi.object({
     author: Joi.string().custom(validObjectId).optional(),
     post: Joi.string().custom(validObjectId).optional(),
+    page: Joi.number().min(1).optional().default(1),
+    limit: Joi.number().min(1).max(50).optional().default(10),
   }),
 };
 const updateCommentSchema = {
@@ -88,7 +90,7 @@ const updateCommentSchema = {
  * @swagger
  * /comments:
  *   get:
- *     summary: Get comments with optional filtering by author or post
+ *     summary: Get paginated comments with optional filtering by author or post
  *     tags: [Comments]
  *     security:
  *       - bearerAuth: []
@@ -103,17 +105,47 @@ const updateCommentSchema = {
  *         schema:
  *           type: string
  *         description: Filter comments by post
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 50
+ *           default: 10
+ *         description: Number of items per page
  *     responses:
  *       200:
- *         description: A list of comments
+ *         description: A paginated list of comments
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/CommentResponse'
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CommentResponse'
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of comments matching the filter
+ *                 page:
+ *                   type: integer
+ *                   description: Current page number
+ *                 limit:
+ *                   type: integer
+ *                   description: Number of items per page
+ *                 hasMore:
+ *                   type: boolean
+ *                   description: Whether there are more comments to load
  *       400:
- *         description: Invalid filters
+ *         description: Invalid filters or pagination parameters
  *   post:
  *     summary: Create a new comment
  *     tags: [Comments]

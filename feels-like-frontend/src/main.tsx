@@ -8,6 +8,7 @@ import MyProfilePage from "./pages/MyProfilePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import SignupPage from "./pages/SignupPage.tsx";
 import ViewPostPage from "./pages/ViewPostPage.tsx";
+import NewPostPage from "./pages/NewPostPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
           {
             path: "posts/:id",
             Component: ViewPostPage,
+          },
+          {
+            path: "/new-post",
+            Component: NewPostPage,
           },
         ],
       },

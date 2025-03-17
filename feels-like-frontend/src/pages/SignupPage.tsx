@@ -194,7 +194,7 @@ export default function SignupPage() {
           <FormSubmitButton content="Create Account" isLoading={isLoading} />
         </form>
         <FormFooter>
-          Already have an account? <Link to="/login">Sign up</Link>{" "}
+          Already have an account? <Link to="/login">Sign in</Link>{" "}
         </FormFooter>
       </FormLayout>
     </StandalonePageLayout>

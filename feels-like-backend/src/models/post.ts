@@ -6,6 +6,7 @@ import { NotFound } from "http-errors";
 export interface IPost extends Document {
   author: Schema.Types.ObjectId;
   content: string;
+  createdAt: Date;
   image: string;
   likes: number;
 }
@@ -14,6 +15,7 @@ const postSchema = new Schema<IPost>(
   {
     author: { required: true, type: Schema.Types.ObjectId },
     content: { required: true, type: String },
+    createdAt: { default: Date.now, type: Date },
     image: { required: true, type: String },
     likes: { default: 0, type: Number },
   },
