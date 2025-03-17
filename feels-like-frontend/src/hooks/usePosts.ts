@@ -28,13 +28,6 @@ export default function usePosts() {
   const totalPages = lastPage?.totalPages || 1;
   const hasMore = currentPage < totalPages;
 
-  console.log("usePosts Debug:", {
-    currentPage,
-    totalPages,
-    hasMore,
-    postsCount: posts.length,
-    isValidating
-  });
 
   return {
     posts,
@@ -44,7 +37,6 @@ export default function usePosts() {
     hasMore,
     loadMore: () => {
       if (hasMore && !isValidating) {
-        console.log(`Loading more posts... Current Page: ${currentPage}, Total Pages: ${totalPages}, Current Size: ${size}`);
         // Force a size increase to load the next page
         setSize(size + 1)
           .then(() => console.log("Successfully increased size to", size + 1))

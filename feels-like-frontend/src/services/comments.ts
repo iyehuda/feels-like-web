@@ -7,7 +7,7 @@ interface CommentData {
   post: EntityID;
 }
 
-interface MongoComment {
+interface CommentResponse {
   _id: EntityID;
   author: EntityID;
   post: EntityID;
@@ -15,7 +15,7 @@ interface MongoComment {
 }
 
 export async function commentPost(comment: CommentData): Promise<PostComment> {
-  const { data } = await apiClient.post<MongoComment>("/comments", comment);
+  const { data } = await apiClient.post<CommentResponse>("/comments", comment);
   return {
     id: data._id,
     author: data.author,
