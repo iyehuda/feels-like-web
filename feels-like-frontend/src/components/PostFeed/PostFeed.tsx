@@ -10,10 +10,11 @@ interface PostFeedProps {
   error: AxiosError | undefined;
   isValidating: boolean;
   hasMore: boolean;
+  onPostDelete?: (postId: string) => void;
 }
 
 export const PostFeed = forwardRef<HTMLDivElement, PostFeedProps>(
-  ({ posts, isLoading, error, isValidating, hasMore }, ref) => {
+  ({ posts, isLoading, error, isValidating, hasMore, onPostDelete }, ref) => {
     return (
       <Box
         sx={{
@@ -46,7 +47,12 @@ export const PostFeed = forwardRef<HTMLDivElement, PostFeedProps>(
         {/* Posts List */}
         <Box sx={{ display: "flex", flexDirection: "column", gap: "3%" }}>
           {posts.map((post) => (
-            <Post key={post.id} postId={post.id} showComments={false} />
+            <Post 
+              key={post.id} 
+              postId={post.id} 
+              showComments={false} 
+              onDelete={onPostDelete}
+            />
           ))}
         </Box>
 
