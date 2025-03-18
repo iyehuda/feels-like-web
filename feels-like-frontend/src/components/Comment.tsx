@@ -1,10 +1,37 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography, IconButton } from "@mui/material";
 import { PostComment } from "../hooks/usePostComments";
 import useUser from "../hooks/useUser";
 import UserAvatar from "./UserAvatar";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { useCallback } from "react";
+import useAuth from "../hooks/useAuth";
+import useSnackbar from "../hooks/useSnackbar";
+import { deleteComment } from "../services/comments";
 
-export default function Comment({ comment }: { comment: PostComment }) {
+interface CommentProps {
+  comment: PostComment;
+  onDelete?: (commentId: string) => void;
+}
+
+export default function Comment({ comment, onDelete }: CommentProps) {
   const { user, isLoading, error } = useUser(comment.author);
+  const { userId } = useAuth();
+  const { showSnackbar } = useSnackbar();
+
+  const handleDelete = useCallback(async () => {
+    try {
+      if (!comment.id) {
+        showSnackbar("Cannot delete comment: Invalid comment ID", "error");
+        return;
+      }
+      await deleteComment(comment.id);
+      onDelete?.(comment.id);
+      showSnackbar("Comment deleted successfully", "success");
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
+      showSnackbar("Failed to delete comment", "error");
+    }
+  }, [comment.id, onDelete, showSnackbar]);
 
   if (isLoading) {
     return (
@@ -21,6 +48,8 @@ export default function Comment({ comment }: { comment: PostComment }) {
   if (!user) {
     return null;
   }
+
+  const isAuthor = userId === comment.author;
 
   return (
     <Box
@@ -43,9 +72,21 @@ export default function Comment({ comment }: { comment: PostComment }) {
           ml: 2,
           paddingY: 1,
           paddingX: 2,
+          position: "relative",
         }}
       >
-        <Typography variant="subtitle2">{user.fullName}</Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Typography variant="subtitle2">{user.fullName}</Typography>
+          {isAuthor && (
+            <IconButton
+              size="small"
+              onClick={handleDelete}
+              sx={{ color: "error.main", padding: 0.5 }}
+            >
+              <DeleteOutlineIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
         <Typography variant="body2" color="text.secondary">
           {comment.content}
         </Typography>

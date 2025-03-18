@@ -17,6 +17,7 @@ export default function usePosts() {
     size,
     setSize,
     isValidating,
+    mutate,
   } = useSWRInfinite<{ posts: Post[]; totalPages: number; currentPage: number }, AxiosError>(getKey, fetcher);
 
   // Flatten posts array (combine all pages)
@@ -28,6 +29,20 @@ export default function usePosts() {
   const totalPages = lastPage?.totalPages || 1;
   const hasMore = currentPage < totalPages;
 
+  const deletePost = (postId: string) => {
+    mutate(currentData => {
+      if (!currentData) return currentData;
+      
+      const updatedData = currentData.map(page => {
+        const updatedPage = { ...page };
+        updatedPage.posts = page.posts.filter(post => post.id !== postId);
+        return updatedPage;
+      });
+
+      // Remove empty pages
+      return updatedData.filter(page => page.posts.length > 0);
+    }, false);
+  };
 
   return {
     posts,
@@ -45,5 +60,6 @@ export default function usePosts() {
         console.log("Cannot load more:", { hasMore, isValidating, currentPage, totalPages });
       }
     },
+    deletePost,
   };
 }

@@ -11,7 +11,7 @@ export interface PostComment {
 }
 
 interface MongoComment {
-  _id: EntityID;
+  id: EntityID;
   author: EntityID;
   post: EntityID;
   content: string;
@@ -36,7 +36,7 @@ interface CommentsResponse {
 const PAGE_SIZE = 10;
 
 const transformComment = (comment: MongoComment): PostComment => ({
-  id: comment._id,
+  id: comment.id,
   author: comment.author,
   post: comment.post,
   content: comment.content,
@@ -81,7 +81,7 @@ export default function usePostComments(postId?: EntityID) {
       // If there's no data yet, create the first page
       mutate([{
         items: [{ 
-          _id: newComment.id,
+          id: newComment.id,
           author: newComment.author,
           post: newComment.post,
           content: newComment.content
@@ -99,7 +99,7 @@ export default function usePostComments(postId?: EntityID) {
         const updatedData = [...currentData];
         const firstPage = { ...updatedData[0] };
         firstPage.items = [{
-          _id: newComment.id,
+          id: newComment.id,
           author: newComment.author,
           post: newComment.post,
           content: newComment.content
@@ -118,6 +118,22 @@ export default function usePostComments(postId?: EntityID) {
     }
   };
 
+  const deleteComment = (commentId: string) => {
+    mutate(currentData => {
+      if (!currentData) return currentData;
+      
+      const updatedData = currentData.map(page => {
+        const updatedPage = { ...page };
+        updatedPage.items = page.items.filter(item => item.id !== commentId);
+        updatedPage.total -= 1;
+        return updatedPage;
+      });
+
+      // Remove empty pages
+      return updatedData.filter(page => page.items.length > 0);
+    }, false);
+  };
+
   return {
     comments,
     error,
@@ -127,6 +143,7 @@ export default function usePostComments(postId?: EntityID) {
     loadMore,
     mutate,
     addComment,
+    deleteComment,
     totalComments,
   };
 }

@@ -1,4 +1,5 @@
 import { apiClient } from "./fetcher";
+import { EntityID } from "../utils/api";
 
 interface PostData {
   content: string;
@@ -17,4 +18,8 @@ export async function createPost(post: PostData): Promise<void> {
       "Content-Type": "multipart/form-data",
     },
   });
+}
+
+export async function deletePost(postId: EntityID): Promise<void> {
+  await apiClient.delete(`/posts/${postId}`);
 }

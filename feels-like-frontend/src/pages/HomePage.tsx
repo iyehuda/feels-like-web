@@ -8,7 +8,7 @@ import { FloatingActionButton } from "../components/FloatingActionButton";
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { posts, error, isLoading, isValidating, hasMore, loadMore } = usePosts();
+  const { posts, error, isLoading, isValidating, hasMore, loadMore, deletePost } = usePosts();
   
   const loadMoreRef = useInfiniteScroll({
     hasMore,
@@ -39,6 +39,7 @@ export default function HomePage() {
         error={error}
         isValidating={isValidating}
         hasMore={hasMore}
+        onPostDelete={deletePost}
       />
 
       <FloatingActionButton onClick={() => navigate("/new-post")}>
