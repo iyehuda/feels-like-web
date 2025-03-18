@@ -8,8 +8,7 @@ import Comment from "./Comment";
 import AddComment from "./AddComment";
 import PostImage from "./PostImage";
 import LikeButton from "./LikeButton";
-import { useCallback, useRef, useEffect } from "react";
-import useAuth from "../hooks/useAuth";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { PostComment } from "../hooks/usePostComments";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
@@ -33,7 +32,6 @@ export default function Post({ postId, showComments = false }: PostProps) {
     isLoadingMore,
     loadMore,
   } = usePostComments(postId);
-  const { userId } = useAuth();
 
   const loaderRef = useInfiniteScroll({
     hasMore: Boolean(hasMore),

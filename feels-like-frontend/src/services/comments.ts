@@ -8,7 +8,7 @@ interface CommentData {
 }
 
 interface CommentResponse {
-  _id: EntityID;
+  id: EntityID;
   author: EntityID;
   post: EntityID;
   content: string;
@@ -17,7 +17,7 @@ interface CommentResponse {
 export async function commentPost(comment: CommentData): Promise<PostComment> {
   const { data } = await apiClient.post<CommentResponse>("/comments", comment);
   return {
-    id: data._id,
+    id: data.id,
     author: data.author,
     post: data.post,
     content: data.content,
