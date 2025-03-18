@@ -118,6 +118,22 @@ export default function usePostComments(postId?: EntityID) {
     }
   };
 
+  const deleteComment = (commentId: string) => {
+    mutate(currentData => {
+      if (!currentData) return currentData;
+      
+      const updatedData = currentData.map(page => {
+        const updatedPage = { ...page };
+        updatedPage.items = page.items.filter(item => item._id !== commentId);
+        updatedPage.total -= 1;
+        return updatedPage;
+      });
+
+      // Remove empty pages
+      return updatedData.filter(page => page.items.length > 0);
+    }, false);
+  };
+
   return {
     comments,
     error,
@@ -127,6 +143,7 @@ export default function usePostComments(postId?: EntityID) {
     loadMore,
     mutate,
     addComment,
+    deleteComment,
     totalComments,
   };
 }

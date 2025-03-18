@@ -27,6 +27,7 @@ export default function Post({ postId, showComments = false }: PostProps) {
     error: commentsError,
     isLoading: commentsLoading,
     addComment,
+    deleteComment,
     totalComments,
     hasMore,
     isLoadingMore,
@@ -45,6 +46,13 @@ export default function Post({ postId, showComments = false }: PostProps) {
       addComment(comment);
     },
     [addComment]
+  );
+
+  const handleCommentDeleted = useCallback(
+    (commentId: string) => {
+      deleteComment(commentId);
+    },
+    [deleteComment]
   );
 
   const handleClick = (e: React.MouseEvent) => {
@@ -107,7 +115,11 @@ export default function Post({ postId, showComments = false }: PostProps) {
               {comments.length > 0 && <Divider sx={{ my: 2 }} />}
               <Box sx={{ maxHeight: showComments ? '400px' : 'auto', overflowY: 'auto' }}>
                 {comments.map((comment) => (
-                  <Comment key={comment.id} comment={comment} />
+                  <Comment 
+                    key={comment.id} 
+                    comment={comment} 
+                    onDelete={handleCommentDeleted}
+                  />
                 ))}
                 {hasMore && (
                   <Box ref={loaderRef} display="flex" justifyContent="center" my={2}>

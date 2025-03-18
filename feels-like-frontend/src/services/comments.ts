@@ -23,3 +23,7 @@ export async function commentPost(comment: CommentData): Promise<PostComment> {
     content: data.content,
   };
 }
+
+export async function deleteComment(commentId: EntityID): Promise<void> {
+  await apiClient.delete(`/comments/${commentId}`);
+}
