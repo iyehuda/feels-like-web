@@ -9,13 +9,14 @@ import Comment from "./Comment";
 import AddComment from "./AddComment";
 import PostImage from "./PostImage";
 import LikeButton from "./LikeButton";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PostComment } from "../hooks/usePostComments";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import useAuth from "../hooks/useAuth";
 import useSnackbar from "../hooks/useSnackbar";
 import { deletePost } from "../services/posts";
+import { getPostLikes } from "../services/likes";
 
 interface PostProps {
   postId: EntityID;
@@ -25,9 +26,11 @@ interface PostProps {
 
 export default function Post({ postId, showComments = false, onDelete }: PostProps) {
   const navigate = useNavigate();
-  const { post, error: postError, isLoading: postLoading } = usePost(postId);
   const { userId } = useAuth();
   const { showSnackbar } = useSnackbar();
+  const { post, isLoading, error } = usePost(postId);
+  const [likedByMe, setLikedByMe] = useState(false);
+  const [totalLikes, setTotalLikes] = useState(0);
   const {
     comments,
     error: commentsError,
@@ -45,6 +48,23 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
     isLoading: Boolean(isLoadingMore),
     onLoadMore: loadMore,
   });
+
+  useEffect(() => {
+    if (post) {
+      setTotalLikes(post.likes);
+      fetchLikeStatus();
+    }
+  }, [post]);
+
+  const fetchLikeStatus = async () => {
+    try {
+      const { likes, likedByMe } = await getPostLikes(postId);
+      setTotalLikes(likes);
+      setLikedByMe(likedByMe);
+    } catch (error) {
+      console.error("Failed to fetch like status:", error);
+    }
+  };
 
   const handleCommentAdded = useCallback(
     (comment: PostComment) => {
@@ -82,12 +102,12 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
     navigate(`/posts/${postId}`);
   };
 
-  if (postLoading || commentsLoading) {
+  if (isLoading || commentsLoading) {
     return <Typography>Loading...</Typography>;
   }
 
-  if (postError || commentsError) {
-    console.error({ postError, commentsError });
+  if (error || commentsError) {
+    console.error({ error, commentsError });
     return <Typography>Error loading post</Typography>;
   }
 
@@ -133,9 +153,9 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
           <Box display={"flex"} flexDirection={"row"} padding={1}>
             <Box display={"flex"} flexDirection={"row"} sx={{ mr: 3 }}>
               <Box sx={{ mr: 1 }}>
-                <LikeButton isSet={post.likedByMe} />
+                <LikeButton postId={postId} isSet={likedByMe} onLikeChange={setLikedByMe} />
               </Box>
-              <Typography>{post.likes} Likes</Typography>
+              <Typography>{totalLikes} Likes</Typography>
             </Box>
             <Box display={"flex"} flexDirection={"row"}>
               <SmsOutlinedIcon sx={{ mr: 1 }} />
