@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import UserProfileCard from "../components/UserProfileCard";
 import { updateUser } from "../services/users";
+import { mutate } from "swr";
 
 export default function MyProfilePage() {
   const navigate = useNavigate();
@@ -28,7 +29,9 @@ export default function MyProfilePage() {
       formData.append("avatar", data.avatar);
     }
     
-    await updateUser(userId, formData);
+    const updatedUser = await updateUser(userId, formData);
+    // Revalidate the user data in the SWR cache
+    await mutate(`/users/${userId}`, updatedUser, false);
   };
 
   return (
