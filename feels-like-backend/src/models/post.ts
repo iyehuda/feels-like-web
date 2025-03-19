@@ -8,7 +8,6 @@ export interface IPost extends Document {
   content: string;
   createdAt: Date;
   image: string;
-  likes: number;
 }
 
 const postSchema = new Schema<IPost>(
@@ -17,7 +16,6 @@ const postSchema = new Schema<IPost>(
     content: { required: true, type: String },
     createdAt: { default: Date.now, type: Date },
     image: { required: true, type: String },
-    likes: { default: 0, type: Number },
   },
   commonSchemaOptions<IPost>(),
 );
