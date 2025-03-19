@@ -3,6 +3,7 @@ import Like, { ILike } from "../models/like";
 import BaseController from "./base-controller";
 import { DBHandler } from "./base-controller";
 import { Conflict, NotFound } from "http-errors";
+import Post from "../models/post";
 
 export default class LikesController extends BaseController<ILike> {
   constructor() {
@@ -20,6 +21,9 @@ export default class LikesController extends BaseController<ILike> {
         post: postId,
         user: userId,
       });
+
+      // Increment the likes count in the post
+      await Post.findByIdAndUpdate(postId, { $inc: { likesCount: 1 } });
 
       res.status(201).json({ message: "Post liked successfully" });
     } catch (error: any) {
@@ -41,6 +45,9 @@ export default class LikesController extends BaseController<ILike> {
       throw NotFound("Like not found");
     }
 
+    // Decrement the likes count in the post
+    await Post.findByIdAndUpdate(postId, { $inc: { likesCount: -1 } });
+
     res.status(200).json({ message: "Post unliked successfully" });
   }
 
@@ -49,13 +56,17 @@ export default class LikesController extends BaseController<ILike> {
     const { postId } = req.params;
     const userId = res.locals.user._id;
 
-    const [likes, userLike] = await Promise.all([
-      this.model.find({ post: postId }).countDocuments(),
+    const [post, userLike] = await Promise.all([
+      Post.findById(postId),
       this.model.findOne({ post: postId, user: userId }),
     ]);
 
+    if (!post) {
+      throw NotFound("Post not found");
+    }
+
     res.json({
-      likes,
+      likes: post.likesCount,
       likedByMe: !!userLike,
     });
   }

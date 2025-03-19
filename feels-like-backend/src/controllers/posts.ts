@@ -4,7 +4,6 @@ import BaseController, { DBHandler } from "./base-controller";
 import { BadRequest, Forbidden, NotFound } from "http-errors";
 import { HydratedDocument } from "mongoose";
 import { unlink } from "node:fs/promises";
-import Like from "../models/like";
 
 export interface PostResponse {
   author: string;
@@ -16,15 +15,13 @@ export interface PostResponse {
 }
 
 async function postResponse(item: HydratedDocument<IPost>, userId?: string): Promise<PostResponse> {
-  const likes = await Like.countDocuments({ post: item._id });
-
   return {
     author: item.author.toString(),
     content: item.content,
     createdAt: item.createdAt,
     id: item.id,
     image: item.image,
-    likes,
+    likes: item.likesCount,
   };
 }
 
