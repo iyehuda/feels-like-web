@@ -133,7 +133,7 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
           <Box display={"flex"} flexDirection={"row"} padding={1}>
             <Box display={"flex"} flexDirection={"row"} sx={{ mr: 3 }}>
               <Box sx={{ mr: 1 }}>
-                <LikeButton isSet={post.likedByMe} />
+                <LikeButton postId={postId} isSet={post.likedByMe} />
               </Box>
               <Typography>{post.likes} Likes</Typography>
             </Box>
