@@ -12,15 +12,11 @@ export interface PostResponse {
   createdAt: Date;
   id: string;
   image: string;
-  likedByMe: boolean;
   likes: number;
 }
 
 async function postResponse(item: HydratedDocument<IPost>, userId?: string): Promise<PostResponse> {
-  const [likes, likedByMe] = await Promise.all([
-    Like.countDocuments({ post: item._id }),
-    userId ? Like.exists({ post: item._id, user: userId }) : false,
-  ]);
+  const likes = await Like.countDocuments({ post: item._id });
 
   return {
     author: item.author.toString(),
@@ -28,7 +24,6 @@ async function postResponse(item: HydratedDocument<IPost>, userId?: string): Pro
     createdAt: item.createdAt,
     id: item.id,
     image: item.image,
-    likedByMe: !!likedByMe,
     likes,
   };
 }

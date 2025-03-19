@@ -9,8 +9,7 @@ export interface Post {
   content: string;
   image: RelativePath;
   likes: number;
-  likedByMe: boolean;
-  createdAt: string; // Added createdAt field
+  createdAt: string;
 }
 
 export default function usePost(postId?: EntityID) {
