@@ -2,7 +2,7 @@ import { Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import usePosts from "../hooks/usePosts";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
-import { WeatherCard } from "../components/WeatherCard";
+import { CurrentWeather } from "../components/CurrentWeather";
 import { PostFeed } from "../components/PostFeed";
 import { FloatingActionButton } from "../components/FloatingActionButton";
 
@@ -25,12 +25,7 @@ export default function HomePage() {
         py: "2%",
       }}
     >
-      <WeatherCard
-        temperature="23°C"
-        condition="Sunny"
-        location="Tel Aviv, Israel"
-        recommendedClothes="T-Shirt and jeans"
-      />
+      <CurrentWeather />
 
       <PostFeed
         ref={loadMoreRef}

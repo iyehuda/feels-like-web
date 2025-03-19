@@ -13,6 +13,7 @@ import { authMiddleware } from "./controllers/auth";
 import postRouter from "./routes/posts";
 import commentRouter from "./routes/comments";
 import likeRouter from "./routes/likes";
+import weatherRouter from "./routes/weather";
 
 const apiSpecs = swaggerJSDoc({
   apis: ["src/routes/*.ts"],
@@ -45,6 +46,7 @@ export function createApp() {
   app.use("/posts", authMiddleware, postRouter);
   app.use("/comments", authMiddleware, commentRouter);
   app.use("/posts", authMiddleware, likeRouter);
+  app.use("/weather", authMiddleware, weatherRouter);
   app.use(errors());
   app.use(errorHandler({ includeStack: environment === Environment.DEV }));
 
