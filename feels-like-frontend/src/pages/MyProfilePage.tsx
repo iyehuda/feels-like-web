@@ -1,5 +1,5 @@
 import { Container } from "@mui/material";
-import useUserPosts from "../hooks/useUserPosts";
+import usePosts from "../hooks/usePosts";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { PostFeed } from "../components/PostFeed";
 import { FloatingActionButton } from "../components/FloatingActionButton";
@@ -12,7 +12,7 @@ import { mutate } from "swr";
 export default function MyProfilePage() {
   const navigate = useNavigate();
   const { userId } = useAuth();
-  const { posts, error, isLoading, isValidating, hasMore, loadMore, deletePost } = useUserPosts(userId || "");
+  const { posts, error, isLoading, isValidating, hasMore, loadMore, deletePost } = usePosts({ userId: userId || "" });
   
   const loadMoreRef = useInfiniteScroll({
     hasMore,
