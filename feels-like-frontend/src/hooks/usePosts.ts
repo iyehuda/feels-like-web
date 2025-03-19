@@ -3,12 +3,31 @@ import { AxiosError } from "axios";
 import fetcher from "../services/fetcher";
 import { Post } from "./usePost";
 
-const PAGE_SIZE = 10; // Increased from 1 to 10 posts per page
+const PAGE_SIZE = 10;
 
-export default function usePosts() {
-  const getKey = (pageIndex: number, previousPageData: { posts: Post[]; totalPages: number; currentPage: number } | null) => {
-    if (previousPageData && previousPageData.posts.length === 0) return null; // Stop fetching when no more posts
-    return `/posts?page=${pageIndex + 1}&limit=${PAGE_SIZE}`;
+export interface PostsResponse {
+  posts: Post[];
+  totalPages: number;
+  currentPage: number;
+}
+
+interface UsePostsOptions {
+  userId?: string;
+  queryParams?: Record<string, string>;
+}
+
+export default function usePosts({ userId, queryParams = {} }: UsePostsOptions = {}) {
+  const getKey = (pageIndex: number, previousPageData: PostsResponse | null) => {
+    if (previousPageData && previousPageData.posts.length === 0) return null;
+    
+    const params = new URLSearchParams({
+      page: (pageIndex + 1).toString(),
+      limit: PAGE_SIZE.toString(),
+      ...(userId && { author: userId }),
+      ...queryParams
+    });
+    
+    return `/posts?${params.toString()}`;
   };
 
   const {
@@ -18,7 +37,7 @@ export default function usePosts() {
     setSize,
     isValidating,
     mutate,
-  } = useSWRInfinite<{ posts: Post[]; totalPages: number; currentPage: number }, AxiosError>(getKey, fetcher);
+  } = useSWRInfinite<PostsResponse, AxiosError>(getKey, fetcher);
 
   // Flatten posts array (combine all pages)
   const posts = data ? data.flatMap((page) => page.posts) : [];
@@ -28,6 +47,8 @@ export default function usePosts() {
   const currentPage = lastPage?.currentPage || 1;
   const totalPages = lastPage?.totalPages || 1;
   const hasMore = currentPage < totalPages;
+
+  const loadMore = () => setSize(size + 1);
 
   const deletePost = (postId: string) => {
     mutate(currentData => {
@@ -50,16 +71,7 @@ export default function usePosts() {
     isLoading: !data && !error,
     isValidating,
     hasMore,
-    loadMore: () => {
-      if (hasMore && !isValidating) {
-        // Force a size increase to load the next page
-        setSize(size + 1)
-          .then(() => console.log("Successfully increased size to", size + 1))
-          .catch((error) => console.error("Failed to load more posts:", error));
-      } else {
-        console.log("Cannot load more:", { hasMore, isValidating, currentPage, totalPages });
-      }
-    },
+    loadMore,
     deletePost,
   };
 }

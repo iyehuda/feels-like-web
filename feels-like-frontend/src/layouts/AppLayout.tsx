@@ -17,7 +17,7 @@ export default function AppLayout() {
       disableCollapsibleSidebar
       slots={{ toolbarActions: Null, sidebarFooter: SidebarFooter }}
     >
-      <PageContainer slotProps={{ header: { breadcrumbs: [] } }} sx={{ margin: 0 }}>
+      <PageContainer slotProps={{ header: { breadcrumbs: [], title: "" } }} sx={{ margin: 0 }}>
         <Outlet />
       </PageContainer>
     </DashboardLayout>

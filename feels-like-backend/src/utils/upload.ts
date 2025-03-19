@@ -2,6 +2,7 @@ import multer from "multer";
 import { Environment, environment, uploadsDir } from "../config";
 import { mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
+import { unlink } from "node:fs/promises";
 
 function createFilename(originalName: string): string {
   const radix = 36;
@@ -13,6 +14,18 @@ function createFilename(originalName: string): string {
 
 export function getFilePath(): string {
   return path.join(uploadsDir, createFilename(".png"));
+}
+
+export async function tryRemoveFile(filePath: string): Promise<void> {
+  try {
+    const fullPath = path.join(process.cwd(), filePath);
+    await unlink(fullPath);
+  } catch (error) {
+    // Ignore errors when file doesn't exist
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+      throw error;
+    }
+  }
 }
 
 export default multer({
