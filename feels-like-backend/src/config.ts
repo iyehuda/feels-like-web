@@ -21,7 +21,6 @@ const defaults = {
   UPLOADS_DIR: "uploads",
   UPLOADS_TEST_DIR: `test-uploads-${process.env.JEST_WORKER_ID}`,
   WEATHER_API_KEY: "",
-  OPENAI_API_KEY: "",
   GEMINI_API_KEY: "",
 };
 
@@ -37,5 +36,4 @@ export const uploadsDir =
   process.env.UPLOADS_DIR ??
   (environment === Environment.TEST ? defaults.UPLOADS_TEST_DIR : defaults.UPLOADS_DIR);
 export const weatherApiKey = process.env.WEATHER_API_KEY ?? defaults.WEATHER_API_KEY;
-export const openaiApiKey = process.env.OPENAI_API_KEY ?? defaults.OPENAI_API_KEY;
 export const geminiApiKey = process.env.GEMINI_API_KEY ?? defaults.GEMINI_API_KEY;
