@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage.tsx";
 import SignupPage from "./pages/SignupPage.tsx";
 import ViewPostPage from "./pages/ViewPostPage.tsx";
 import NewPostPage from "./pages/NewPostPage.tsx";
+import EditPostPage from "./pages/EditPostPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
           {
             path: "posts/:id",
             Component: ViewPostPage,
+          },
+          {
+            path: "posts/:id/edit",
+            Component: EditPostPage,
           },
           {
             path: "/new-post",
