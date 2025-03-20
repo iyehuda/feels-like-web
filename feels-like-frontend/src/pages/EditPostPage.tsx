@@ -5,6 +5,7 @@ import { updatePost } from "../services/posts";
 import { mutate } from "swr";
 import usePost from "../hooks/usePost";
 import PostForm from "../components/PostForm";
+import { getBackendUrl } from "../utils/api";
 
 export default function EditPostPage() {
   const { id: postId } = useParams();
@@ -51,7 +52,7 @@ export default function EditPostPage() {
     <Container maxWidth="md">
       <PostForm
         initialContent={post.content}
-        initialImageUrl={post.image ? `${import.meta.env.VITE_API_URL}${post.image}` : undefined}
+        initialImageUrl={post.image ? getBackendUrl(post.image) : undefined}
         onSubmit={handleSubmit}
         submitButtonText="Update Post"
         title="Edit Post"
