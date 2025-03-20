@@ -5,6 +5,7 @@ import UserDetails from "./UserDetails";
 import usePostComments from "../hooks/usePostComments";
 import SmsOutlinedIcon from "@mui/icons-material/SmsOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditIcon from "@mui/icons-material/Edit";
 import Comment from "./Comment";
 import AddComment from "./AddComment";
 import PostImage from "./PostImage";
@@ -91,6 +92,10 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
     }
   }, [postId, onDelete, showSnackbar]);
 
+  const handleEdit = useCallback(() => {
+    navigate(`/posts/${postId}/edit`);
+  }, [navigate, postId]);
+
   const handleClick = (e: React.MouseEvent) => {
     // Prevent navigation if clicking on interactive elements
     if (
@@ -134,16 +139,28 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <UserDetails userId={post.author} />
           {isAuthor && (
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete();
-              }}
-              sx={{ color: "error.main", padding: 0.5 }}
-            >
-              <DeleteOutlineIcon fontSize="small" />
-            </IconButton>
+            <Box>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEdit();
+                }}
+                sx={{ color: "primary.main", padding: 0.5, mr: 0.5 }}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete();
+                }}
+                sx={{ color: "error.main", padding: 0.5 }}
+              >
+                <DeleteOutlineIcon fontSize="small" />
+              </IconButton>
+            </Box>
           )}
         </Box>
         <Divider sx={{ mt: 2 }} />
