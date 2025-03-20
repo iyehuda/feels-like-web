@@ -10,6 +10,7 @@ interface WeatherData {
   feelsLike: number;
   humidity: number;
   windSpeed: number;
+  clothingRecommendation: string;
 }
 
 export function CurrentWeather() {
@@ -63,20 +64,12 @@ export function CurrentWeather() {
     return null;
   }
 
-  // Simple clothing recommendation based on temperature
-  const getRecommendedClothes = (temp: number): string => {
-    if (temp < 10) return "Warm jacket, scarf, and gloves";
-    if (temp < 20) return "Light jacket or sweater";
-    if (temp < 25) return "T-shirt and light pants";
-    return "Light, breathable clothing";
-  };
-
   return (
     <WeatherCard
       temperature={`${Math.round(weatherData.temperature)}°C`}
       condition={weatherData.condition}
       location={weatherData.location}
-      recommendedClothes={getRecommendedClothes(weatherData.temperature)}
+      recommendedClothes={weatherData.clothingRecommendation}
     />
   );
 } 
