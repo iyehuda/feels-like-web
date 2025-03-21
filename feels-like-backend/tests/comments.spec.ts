@@ -127,7 +127,13 @@ describe("GET /comments", () => {
       .auth(commenterAuth.accessToken, { type: "bearer" });
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject([expectedCommentResponse()]);
+    expect(response.body).toMatchObject({
+      items: [expectedCommentResponse()],
+      total: 1,
+      page: 1,
+      limit: 10,
+      hasMore: false
+    });
   });
 
   test("should get comments by author", async () => {
@@ -136,17 +142,28 @@ describe("GET /comments", () => {
       .auth(commenterAuth.accessToken, { type: "bearer" });
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject([expectedCommentResponse()]);
+    expect(response.body).toMatchObject({
+      items: [expectedCommentResponse()],
+      total: 1,
+      page: 1,
+      limit: 10,
+      hasMore: false
+    });
   });
 
   test("should return an empty result if no comments found", async () => {
     const response = await request(app)
       .get(`/comments?author=${nonExistentId}`)
       .auth(commenterAuth.accessToken, { type: "bearer" });
-    const comments = response.body as CommentResponse[];
 
     expect(response.status).toBe(200);
-    expect(comments.length).toBe(0);
+    expect(response.body).toMatchObject({
+      items: [],
+      total: 0,
+      page: 1,
+      limit: 10,
+      hasMore: false
+    });
   });
 });
 

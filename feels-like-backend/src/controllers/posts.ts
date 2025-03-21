@@ -4,6 +4,7 @@ import BaseController, { DBHandler } from "./base-controller";
 import { BadRequest, Forbidden, NotFound } from "http-errors";
 import { HydratedDocument } from "mongoose";
 import { unlink } from "node:fs/promises";
+import Like from "../models/like";
 
 export interface PostResponse {
   author: string;
@@ -12,9 +13,16 @@ export interface PostResponse {
   id: string;
   image: string;
   likes: number;
+  likedByMe: boolean;
 }
 
 async function postResponse(item: HydratedDocument<IPost>, userId?: string): Promise<PostResponse> {
+  let likedByMe = false;
+  if (userId) {
+    const like = await Like.findOne({ post: item._id, user: userId });
+    likedByMe = !!like;
+  }
+
   return {
     author: item.author.toString(),
     content: item.content,
@@ -22,6 +30,7 @@ async function postResponse(item: HydratedDocument<IPost>, userId?: string): Pro
     id: item.id,
     image: item.image,
     likes: item.likesCount,
+    likedByMe,
   };
 }
 
