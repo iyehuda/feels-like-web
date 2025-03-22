@@ -1,11 +1,39 @@
+version: '3.8'
+
 services:
-  mongo:
-    image: mongo:8.0.5
+  frontend:
+    build:
+      context: ./feels-like-frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=https://node50.cs.colman.ac.il:4000
     ports:
-      - 27017:27017
+      - "443:443"
     volumes:
-      - mongo-data:/data/db
-    restart: always
+      - ./ssl:/ssl
+    environment:
+      - PORT=443
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./feels-like-backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./ssl:/ssl
+      - ./feels-like-backend/uploads:/app/uploads
+      - ./feels-like-backend/.env:/app/.env
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   mongo-data:

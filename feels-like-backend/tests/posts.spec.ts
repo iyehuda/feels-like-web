@@ -131,7 +131,11 @@ describe("GET /posts", () => {
       .auth(authorAuth.accessToken, { type: "bearer" });
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject([expectedPostResponse()]);
+    expect(response.body).toMatchObject({
+      currentPage: 1,
+      posts: [expectedPostResponse()],
+      totalPages: 1
+    });
   });
 
   test("should get posts by author", async () => {
@@ -140,17 +144,24 @@ describe("GET /posts", () => {
       .auth(authorAuth.accessToken, { type: "bearer" });
 
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject([expectedPostResponse()]);
+    expect(response.body).toMatchObject({
+      currentPage: 1,
+      posts: [expectedPostResponse()],
+      totalPages: 1
+    });
   });
 
   test("should return an empty result if no posts found", async () => {
     const response = await request(app)
       .get(`/posts?author=${nonExistentId}`)
       .auth(authorAuth.accessToken, { type: "bearer" });
-    const posts = response.body as PostResponse[];
 
     expect(response.status).toBe(200);
-    expect(posts.length).toBe(0);
+    expect(response.body).toMatchObject({
+      currentPage: 1,
+      posts: [],
+      totalPages: 0
+    });
   });
 });
 
