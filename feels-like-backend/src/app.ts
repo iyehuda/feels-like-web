@@ -32,12 +32,6 @@ const apiSpecs = swaggerJSDoc({
 export function createApp() {
   const app = express();
 
-  // Request logging
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-  });
-
   app.use(morgan(environment === Environment.PROD ? "combined" : "dev"));
   app.use(bodyParser.json({ limit: '10mb' }));
   app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
@@ -80,72 +74,12 @@ export function createApp() {
     }
   }));
 
-  // API routes with error handling
-  app.use("/auth", (req, res, next) => {
-    authRouter(req, res, (err) => {
-      if (err) {
-        console.error('Auth route error:', err);
-        next(err);
-      } else {
-        next();
-      }
-    });
-  });
-
-  app.use("/users", authMiddleware, (req, res, next) => {
-    userRouter(req, res, (err) => {
-      if (err) {
-        console.error('Users route error:', err);
-        next(err);
-      } else {
-        next();
-      }
-    });
-  });
-
-  app.use("/posts", authMiddleware, (req, res, next) => {
-    postRouter(req, res, (err) => {
-      if (err) {
-        console.error('Posts route error:', err);
-        next(err);
-      } else {
-        next();
-      }
-    });
-  });
-
-  app.use("/comments", authMiddleware, (req, res, next) => {
-    commentRouter(req, res, (err) => {
-      if (err) {
-        console.error('Comments route error:', err);
-        next(err);
-      } else {
-        next();
-      }
-    });
-  });
-
-  app.use("/posts", authMiddleware, (req, res, next) => {
-    likeRouter(req, res, (err) => {
-      if (err) {
-        console.error('Likes route error:', err);
-        next(err);
-      } else {
-        next();
-      }
-    });
-  });
-
-  app.use("/weather", authMiddleware, (req, res, next) => {
-    weatherRouter(req, res, (err) => {
-      if (err) {
-        console.error('Weather route error:', err);
-        next(err);
-      } else {
-        next();
-      }
-    });
-  });
+  app.use("/auth", authRouter);
+  app.use("/users", authMiddleware, userRouter);
+  app.use("/posts", authMiddleware, postRouter);
+  app.use("/comments", authMiddleware, commentRouter);
+  app.use("/posts", authMiddleware, likeRouter);
+  app.use("/weather", authMiddleware, weatherRouter);
 
   // 404 handler
   app.use((req, res) => {
