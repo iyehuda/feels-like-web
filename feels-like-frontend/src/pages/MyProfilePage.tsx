@@ -1,4 +1,4 @@
-import { Container } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import usePosts from "../hooks/usePosts";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import PostFeed from "../components/PostFeed";
@@ -49,6 +49,10 @@ export default function MyProfilePage() {
       }}
     >
       {userId && <UserProfileCard userId={userId} onEditProfile={handleEditProfile} />}
+
+      <Typography variant="h6" mt={4}>
+        My Posts
+      </Typography>
 
       <PostFeed
         ref={loadMoreRef}
