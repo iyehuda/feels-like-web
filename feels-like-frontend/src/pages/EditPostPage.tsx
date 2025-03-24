@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Container, Typography, Box, CircularProgress } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { updatePost } from "../services/posts";
@@ -13,22 +13,24 @@ export default function EditPostPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { post, isLoading: isLoadingPost } = usePost(postId);
 
-  const handleSubmit = async (data: { content: string; image?: File }) => {
-    if (!postId) {
-      throw new Error("Invalid post ID");
-    }
+  const handleSubmit = useCallback(
+    async (data: { content: string; image?: File }) => {
+      if (!postId) {
+        throw new Error("Invalid post ID");
+      }
 
-    setIsLoading(true);
-    try {
-      await updatePost(postId, data);
-      // Trigger SWR cache refresh to update posts
-      mutate("/posts");
-      mutate(`/posts/${postId}`);
-      navigate(`/posts/${postId}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      setIsLoading(true);
+      try {
+        await updatePost(postId, data);
+        mutate("/posts");
+        mutate(`/posts/${postId}`);
+        navigate(`/posts/${postId}`);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [navigate, postId],
+  );
 
   if (isLoadingPost) {
     return (

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   frontend:
@@ -28,6 +28,16 @@ services:
       - ./ssl:/ssl
       - ./feels-like-backend/uploads:/app/uploads
       - ./feels-like-backend/.env:/app/.env
+    networks:
+      - app-network
+
+  db:
+    image: mongo:8.0.5
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
     networks:
       - app-network
 

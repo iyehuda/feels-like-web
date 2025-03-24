@@ -25,7 +25,7 @@ export default function LikeButton({ postId, isSet, onLikeChange }: LikeButtonPr
         await likePost(postId);
         showSnackbar("Post liked", "success");
       }
-      
+
       // Revalidate the post data
       await mutate(`/posts/${postId}`);
       onLikeChange?.(!isSet);

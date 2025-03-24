@@ -46,7 +46,7 @@ const postIdParamSchema = {
 likeRouter.post(
   "/:postId/like",
   celebrate(postIdParamSchema),
-  controller.likePost.bind(controller)
+  controller.likePost.bind(controller),
 );
 
 /**
@@ -75,7 +75,7 @@ likeRouter.post(
 likeRouter.delete(
   "/:postId/unlike",
   celebrate(postIdParamSchema),
-  controller.unlikePost.bind(controller)
+  controller.unlikePost.bind(controller),
 );
 
 /**
@@ -115,7 +115,7 @@ likeRouter.delete(
 likeRouter.get(
   "/:postId/likes",
   celebrate(postIdParamSchema),
-  controller.getLikes.bind(controller)
+  controller.getLikes.bind(controller),
 );
 
-export default likeRouter; 
+export default likeRouter;

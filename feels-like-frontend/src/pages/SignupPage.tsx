@@ -1,5 +1,5 @@
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router";
 import useSnackbar from "../hooks/useSnackbar";
 import useAuth from "../hooks/useAuth";
@@ -60,35 +60,38 @@ export default function SignupPage() {
     reader.readAsDataURL(file);
   }, [avatarInput, showSnackbar]);
 
-  const onSubmit: SubmitHandler<SignupInputs> = async (data) => {
-    try {
-      setIsLoading(true);
+  const onSubmit: SubmitHandler<SignupInputs> = useCallback(
+    async (data) => {
+      try {
+        setIsLoading(true);
 
-      const avatar = avatarInput?.item(0);
-      if (!avatar) {
-        showSnackbar("Please select an avatar image", "error");
-        return;
+        const avatar = avatarInput?.item(0);
+        if (!avatar) {
+          showSnackbar("Please select an avatar image", "error");
+          return;
+        }
+
+        const response = await signup({
+          avatar: data.avatar[0],
+          email: data.email,
+          fullName: data.fullName,
+          password: data.password,
+        });
+        setAuthInfo(response);
+        showSnackbar("Account created successfully!", "success");
+        navigate("/");
+      } catch (error) {
+        console.error("Signup error:", error);
+        showSnackbar(
+          error instanceof Error ? error.message : "Failed to sign up. Please try again.",
+          "error",
+        );
+      } finally {
+        setIsLoading(false);
       }
-
-      const response = await signup({
-        avatar: data.avatar[0],
-        email: data.email,
-        fullName: data.fullName,
-        password: data.password,
-      });
-      setAuthInfo(response);
-      showSnackbar("Account created successfully!", "success");
-      navigate("/");
-    } catch (error) {
-      console.error("Signup error:", error);
-      showSnackbar(
-        error instanceof Error ? error.message : "Failed to sign up. Please try again.",
-        "error",
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [avatarInput, navigate, setAuthInfo, showSnackbar],
+  );
 
   return (
     <StandalonePageLayout>

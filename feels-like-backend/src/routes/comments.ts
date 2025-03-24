@@ -75,9 +75,9 @@ const newCommentSchema = {
 const getCommentsSchema = {
   [Segments.QUERY]: Joi.object({
     author: Joi.string().custom(validObjectId).optional(),
-    post: Joi.string().custom(validObjectId).optional(),
-    page: Joi.number().min(1).optional().default(1),
     limit: Joi.number().min(1).max(50).optional().default(10),
+    page: Joi.number().min(1).optional().default(1),
+    post: Joi.string().custom(validObjectId).optional(),
   }),
 };
 const updateCommentSchema = {

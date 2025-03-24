@@ -5,7 +5,7 @@ interface FloatingActionButtonProps {
   children: React.ReactNode;
 }
 
-export const FloatingActionButton = ({ onClick, children }: FloatingActionButtonProps) => {
+export default function FloatingActionButton({ onClick, children }: FloatingActionButtonProps) {
   return (
     <Button
       variant="contained"
@@ -27,4 +27,4 @@ export const FloatingActionButton = ({ onClick, children }: FloatingActionButton
       {children}
     </Button>
   );
-}; 
+}

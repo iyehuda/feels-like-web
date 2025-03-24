@@ -1,26 +1,27 @@
 import { connect, disconnect } from "./db";
-import { dbConnectionString, port } from "./config";
+import { dbConnectionString, port, sslCertPath, sslKeyPath } from "./config";
 import { createApp } from "./app";
-import https from 'https';
-import fs from 'fs';
+import https from "https";
+import fs from "node:fs/promises";
 
 async function start() {
   try {
-    console.log('Starting server...');
+    console.log("Starting server...");
     const app = createApp();
-    
-    console.log('Connecting to database...');
+
+    console.log("Connecting to database...");
     await connect(dbConnectionString);
-    console.log('Database connected successfully');
+    console.log("Database connected successfully");
 
-    console.log('Loading SSL certificates...');
+    console.log("Loading SSL certificates...");
     const sslOptions = {
-      key: fs.readFileSync('/ssl/key.pem'),
-      cert: fs.readFileSync('/ssl/cert.pem')
+      cert: await fs.readFile(sslCertPath),
+      key: await fs.readFile(sslKeyPath),
     };
-    console.log('SSL certificates loaded successfully');
+    console.log("SSL certificates loaded successfully");
 
-    const server = https.createServer(sslOptions, app).listen(Number(port), '0.0.0.0', () => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    const server = https.createServer(sslOptions, app).listen(Number(port), "0.0.0.0", () => {
       console.log(`Server running on port ${port}`);
     });
 

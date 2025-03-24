@@ -41,4 +41,4 @@ export default function Card({ title, children, action }: CardProps) {
       {children}
     </Paper>
   );
-} 
+}

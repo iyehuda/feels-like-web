@@ -28,11 +28,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [reloadAuthInfo]);
 
-  const setAuthInfo = (authInfo: AuthInfo) => {
-    setStoredAuthInfo(authInfo);
-  };
-
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await authService.logout();
     } catch (error) {
@@ -40,7 +36,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       clearStoredAuthInfo();
     }
-  };
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -48,7 +44,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         accessToken: authState.accessToken,
         refreshToken: authState.refreshToken,
         userId: authState.userId,
-        setAuthInfo,
+        setAuthInfo: setStoredAuthInfo,
         logout,
         isAuthenticated: isAuthenticated(),
       }}

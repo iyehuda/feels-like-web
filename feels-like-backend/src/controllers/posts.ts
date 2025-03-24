@@ -20,7 +20,7 @@ async function postResponse(item: HydratedDocument<IPost>, userId?: string): Pro
   let likedByMe = false;
   if (userId) {
     const like = await Like.findOne({ post: item._id, user: userId });
-    likedByMe = !!like;
+    likedByMe = Boolean(like);
   }
 
   return {
@@ -29,8 +29,8 @@ async function postResponse(item: HydratedDocument<IPost>, userId?: string): Pro
     createdAt: item.createdAt,
     id: item.id,
     image: item.image,
-    likes: item.likesCount,
     likedByMe,
+    likes: item.likesCount,
   };
 }
 
@@ -90,7 +90,7 @@ export default class PostsController extends BaseController<IPost> {
         .limit(limit)
         .exec();
 
-      const posts = await Promise.all(items.map(item => postResponse(item, userId)));
+      const posts = await Promise.all(items.map((item) => postResponse(item, userId)));
 
       res.status(200).json({
         currentPage: page,

@@ -94,7 +94,6 @@ async function getUserByRefreshToken(refreshToken: string): Promise<HydratedDocu
   return user;
 }
 
-// eslint-disable-next-line max-statements
 export async function signup(req: Request, res: Response) {
   const { email, password, fullName } = req.body;
   const { path: avatar } = req.file || { path: "" };

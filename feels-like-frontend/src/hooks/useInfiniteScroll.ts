@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 interface UseInfiniteScrollProps {
   hasMore: boolean;
@@ -7,12 +7,12 @@ interface UseInfiniteScrollProps {
   rootMargin?: string;
 }
 
-export const useInfiniteScroll = ({
+export default function useInfiniteScroll({
   hasMore,
   isLoading,
   onLoadMore,
-  rootMargin = "20%"
-}: UseInfiniteScrollProps) => {
+  rootMargin = "20%",
+}: UseInfiniteScrollProps) {
   const targetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export const useInfiniteScroll = ({
       },
       {
         rootMargin,
-      }
+      },
     );
 
     const currentRef = targetRef.current;
@@ -41,4 +41,4 @@ export const useInfiniteScroll = ({
   }, [hasMore, isLoading, onLoadMore, rootMargin]);
 
   return targetRef;
-}; 
+}

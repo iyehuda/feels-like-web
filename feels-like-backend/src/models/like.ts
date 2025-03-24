@@ -12,9 +12,9 @@ export interface ILike extends Document {
 
 const likeSchema = new Schema<ILike>(
   {
+    createdAt: { default: Date.now, type: Date },
     post: { ref: "Post", required: true, type: Schema.Types.ObjectId },
     user: { ref: "User", required: true, type: Schema.Types.ObjectId },
-    createdAt: { default: Date.now, type: Date },
   },
   commonSchemaOptions<ILike>(),
 );
@@ -33,4 +33,4 @@ likeSchema.pre("save", async function checkPostAndUserExist() {
   }
 });
 
-export default model("Like", likeSchema); 
+export default model("Like", likeSchema);

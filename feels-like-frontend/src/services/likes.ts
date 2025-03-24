@@ -14,4 +14,4 @@ export async function unlikePost(postId: EntityID) {
 export async function getPostLikes(postId: EntityID) {
   const response = await apiClient.get(`/posts/${postId}/likes`);
   return response.data;
-} 
+}

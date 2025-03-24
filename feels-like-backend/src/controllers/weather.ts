@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import { Request, Response } from "express";
 import { DBHandler } from "./base-controller";
 import axios from "axios";
@@ -18,8 +19,8 @@ export interface WeatherResponse {
 
 // Fallback recommendation based on temperature and conditions
 function getFallbackRecommendation(temp: number, condition: string, windSpeed: number): string {
-  let baseRecommendation = "";
-  
+  let baseRecommendation = "Very light, breathable clothing";
+
   // Temperature-based recommendations
   if (temp < 5) {
     baseRecommendation = "Heavy winter coat, scarf, gloves, and warm boots";
@@ -31,8 +32,6 @@ function getFallbackRecommendation(temp: number, condition: string, windSpeed: n
     baseRecommendation = "T-shirt and light pants";
   } else if (temp < 25) {
     baseRecommendation = "Light, breathable clothing";
-  } else {
-    baseRecommendation = "Very light, breathable clothing";
   }
 
   // Add condition-specific recommendations
@@ -50,7 +49,9 @@ function getFallbackRecommendation(temp: number, condition: string, windSpeed: n
 }
 
 export default class WeatherController {
+  // eslint-disable-next-line max-lines-per-function, class-methods-use-this
   @DBHandler
+  // eslint-disable-next-line max-statements
   async getCurrentWeather(req: Request, res: Response): Promise<void> {
     try {
       const { latitude, longitude } = req.query;
@@ -61,41 +62,42 @@ export default class WeatherController {
       }
 
       const response = await axios.get(
-        `http://api.weatherapi.com/v1/current.json?key=${weatherApiKey}&q=${latitude},${longitude}&aqi=no`
+        `http://api.weatherapi.com/v1/current.json?key=${weatherApiKey}&q=${latitude},${longitude}&aqi=no`,
       );
 
       const weatherData = response.data;
-      const current = weatherData.current;
-      const location = weatherData.location;
+      const { current } = weatherData;
+      const { location } = weatherData;
 
-      let clothingRecommendation: string;
+      let clothingRecommendation = "";
 
       try {
         // Try to get AI recommendation using Gemini
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const prompt = `Based on these weather conditions (Temperature: ${current.temp_c}°C, Feels like: ${current.feelslike_c}°C, Condition: ${current.condition.text}, Humidity: ${current.humidity}%, Wind Speed: ${current.wind_kph} km/h), provide exactly 5 words for what to wear. Example format: "Wear warm jacket with scarf".`;
-        
+
         const result = await model.generateContent(prompt);
-        const response = await result.response;
-        clothingRecommendation = response.text() || "";
+        const { response: recommendationResponse } = result;
+        clothingRecommendation = recommendationResponse.text() || clothingRecommendation;
       } catch (geminiError) {
         // If Gemini fails (e.g., quota exceeded), use fallback recommendation
         console.warn("Gemini API error, using fallback recommendation:", geminiError);
         clothingRecommendation = getFallbackRecommendation(
           current.temp_c,
           current.condition.text,
-          current.wind_kph
+          current.wind_kph,
         );
       }
 
       const weatherResponse: WeatherResponse = {
-        temperature: current.temp_c,
-        location: `${location.name}, ${location.country}`,
+        clothingRecommendation:
+          clothingRecommendation || "Unable to generate clothing recommendation",
         condition: current.condition.text,
         feelsLike: current.feelslike_c,
         humidity: current.humidity,
+        location: `${location.name}, ${location.country}`,
+        temperature: current.temp_c,
         windSpeed: current.wind_kph,
-        clothingRecommendation: clothingRecommendation || "Unable to generate clothing recommendation",
       };
 
       res.json(weatherResponse);
@@ -104,4 +106,4 @@ export default class WeatherController {
       res.status(500).json({ error: "Failed to fetch weather data" });
     }
   }
-} 
+}

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import Like, { ILike } from "../models/like";
-import BaseController from "./base-controller";
-import { DBHandler } from "./base-controller";
+import BaseController, { DBHandler, DuplicateKeyErrorCode } from "./base-controller";
 import { Conflict, NotFound } from "http-errors";
 import Post from "../models/post";
 
@@ -27,7 +26,7 @@ export default class LikesController extends BaseController<ILike> {
 
       res.status(201).json({ message: "Post liked successfully" });
     } catch (error: any) {
-      if (error.code === 11000) {
+      if (error.code === DuplicateKeyErrorCode) {
         throw Conflict("You have already liked this post");
       }
       throw error;
@@ -66,8 +65,8 @@ export default class LikesController extends BaseController<ILike> {
     }
 
     res.json({
+      likedByMe: Boolean(userLike),
       likes: post.likesCount,
-      likedByMe: !!userLike,
     });
   }
-} 
+}

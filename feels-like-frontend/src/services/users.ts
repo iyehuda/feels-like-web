@@ -9,4 +9,4 @@ export async function updateUser(userId: EntityID, formData: FormData): Promise<
     },
   });
   return response.data;
-} 
+}

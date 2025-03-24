@@ -2,7 +2,7 @@ import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useNavigate, Link } from "react-router";
 import useAuth from "../hooks/useAuth";
 import useSnackbar from "../hooks/useSnackbar";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import FormFooter from "../components/FormFooter";
 import FormSubmitButton from "../components/FormSubmitButton";
 import FormTextField from "../components/FormTextField";
@@ -30,46 +30,52 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginInputs>();
 
-  const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
-    try {
-      setIsLoading(true);
-      const response = await login(data.email, data.password);
-      setAuthInfo(response);
-      showSnackbar("Welcome!", "success");
-      navigate("/");
-    } catch (error) {
-      console.error("Login failed:", error);
-      showSnackbar(
-        error instanceof Error ? error.message : "Login failed. Please check your credentials.",
-        "error",
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const onSubmit: SubmitHandler<LoginInputs> = useCallback(
+    async (data) => {
+      try {
+        setIsLoading(true);
+        const response = await login(data.email, data.password);
+        setAuthInfo(response);
+        showSnackbar("Welcome!", "success");
+        navigate("/");
+      } catch (error) {
+        console.error("Login failed:", error);
+        showSnackbar(
+          error instanceof Error ? error.message : "Login failed. Please check your credentials.",
+          "error",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [navigate, setAuthInfo, showSnackbar],
+  );
 
-  const onGoogleLoginSuccess = async (response: CredentialResponse) => {
-    console.log(response);
-    setIsGoogleLoading(true);
-    try {
-      const authResponse = await continueWithGoogle(response.credential!);
-      setAuthInfo(authResponse);
-      showSnackbar("Welcome!", "success");
-      navigate("/");
-    } catch (error) {
-      console.error("Failed to login with Google:", error);
-      showSnackbar(
-        error instanceof Error ? error.message : "Failed to login with Google.",
-        "error",
-      );
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  };
+  const onGoogleLoginSuccess = useCallback(
+    async (response: CredentialResponse) => {
+      console.log(response);
+      setIsGoogleLoading(true);
+      try {
+        const authResponse = await continueWithGoogle(response.credential!);
+        setAuthInfo(authResponse);
+        showSnackbar("Welcome!", "success");
+        navigate("/");
+      } catch (error) {
+        console.error("Failed to login with Google:", error);
+        showSnackbar(
+          error instanceof Error ? error.message : "Failed to login with Google.",
+          "error",
+        );
+      } finally {
+        setIsGoogleLoading(false);
+      }
+    },
+    [navigate, setAuthInfo, showSnackbar],
+  );
 
-  const onGoogleLoginError = () => {
+  const onGoogleLoginError = useCallback(() => {
     console.error("Failed to login with Google");
-  };
+  }, []);
 
   return (
     <StandalonePageLayout>

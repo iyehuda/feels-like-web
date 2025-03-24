@@ -34,12 +34,15 @@ export default function AddComment({ postId, onCommentAdded }: AddCommentProps) 
     }
   }, [comment, onCommentAdded, postId, showSnackbar, isSubmitting]);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
+  const handleKeyPress = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    },
+    [handleSend],
+  );
 
   return (
     <Box
@@ -62,16 +65,12 @@ export default function AddComment({ postId, onCommentAdded }: AddCommentProps) 
         onChange={(e) => setComment(e.target.value)}
         onKeyPress={handleKeyPress}
         sx={{
-          '& .MuiOutlinedInput-root': {
+          "& .MuiOutlinedInput-root": {
             borderRadius: 2,
           },
         }}
       />
-      <IconButton 
-        color="primary" 
-        onClick={handleSend} 
-        disabled={!comment.trim() || isSubmitting}
-      >
+      <IconButton color="primary" onClick={handleSend} disabled={!comment.trim() || isSubmitting}>
         <SendOutlinedIcon />
       </IconButton>
     </Box>

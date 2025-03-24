@@ -134,7 +134,7 @@ describe("GET /posts", () => {
     expect(response.body).toMatchObject({
       currentPage: 1,
       posts: [expectedPostResponse()],
-      totalPages: 1
+      totalPages: 1,
     });
   });
 
@@ -147,7 +147,7 @@ describe("GET /posts", () => {
     expect(response.body).toMatchObject({
       currentPage: 1,
       posts: [expectedPostResponse()],
-      totalPages: 1
+      totalPages: 1,
     });
   });
 
@@ -160,7 +160,7 @@ describe("GET /posts", () => {
     expect(response.body).toMatchObject({
       currentPage: 1,
       posts: [],
-      totalPages: 0
+      totalPages: 0,
     });
   });
 });

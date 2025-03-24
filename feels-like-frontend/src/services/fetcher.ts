@@ -7,8 +7,6 @@ export const apiClient = axios.create({
   baseURL: API_CONFIG.baseURL,
 });
 
-const fetcher = async (url: string) => apiClient.get(url).then((res) => res.data);
-
 // Store pending requests that will be retried after token refresh
 let isRefreshing = false;
 let failedQueue: Array<{
@@ -18,7 +16,7 @@ let failedQueue: Array<{
 }> = [];
 
 // Process the queue of failed requests
-const processQueue = (error: Error | null, token: string | null = null) => {
+function processQueue(error: Error | null, token: string | null = null) {
   failedQueue.forEach((request) => {
     if (error) {
       request.reject(error);
@@ -32,7 +30,7 @@ const processQueue = (error: Error | null, token: string | null = null) => {
   });
 
   failedQueue = [];
-};
+}
 
 apiClient.interceptors.request.use((config) => {
   const authInfo = getStoredAuthInfo();
@@ -104,4 +102,6 @@ apiClient.interceptors.response.use(
   },
 );
 
-export default fetcher;
+export default async function fetcher(url: string) {
+  return apiClient.get(url).then((res) => res.data);
+}

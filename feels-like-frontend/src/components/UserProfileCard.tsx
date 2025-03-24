@@ -1,7 +1,7 @@
 import { Box, Typography, TextField, Avatar, IconButton, Button, Stack } from "@mui/material";
 import Card from "./Card";
 import { EntityID, getBackendUrl } from "../utils/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useUser from "../hooks/useUser";
 import { CircularProgress } from "@mui/material";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
@@ -28,7 +28,7 @@ export default function UserProfileCard({ userId, onEditProfile }: UserProfileCa
     }
   }, [user]);
 
-  const handleAvatarClick = () => {
+  const handleAvatarClick = useCallback(() => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
@@ -40,9 +40,9 @@ export default function UserProfileCard({ userId, onEditProfile }: UserProfileCa
       }
     };
     input.click();
-  };
+  }, [setAvatarFile, setAvatarPreview]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     try {
       await onEditProfile({
         fullName,
@@ -51,18 +51,19 @@ export default function UserProfileCard({ userId, onEditProfile }: UserProfileCa
       setIsEditing(false);
       showSnackbar("Profile updated successfully", "success");
     } catch (error) {
+      console.error("Failed to update profile", error);
       showSnackbar("Failed to update profile", "error");
     }
-  };
+  }, [avatarFile, fullName, onEditProfile, showSnackbar]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     if (user) {
       setFullName(user.fullName);
       setAvatarPreview(user.avatar ? getBackendUrl(user.avatar) : null);
       setAvatarFile(null);
     }
     setIsEditing(false);
-  };
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -83,12 +84,16 @@ export default function UserProfileCard({ userId, onEditProfile }: UserProfileCa
   }
 
   return (
-    <Card 
-      title="My Profile" 
-      action={isEditing ? undefined : { 
-        label: "Edit Profile", 
-        onClick: () => setIsEditing(true) 
-      }}
+    <Card
+      title="My Profile"
+      action={
+        isEditing
+          ? undefined
+          : {
+              label: "Edit Profile",
+              onClick: () => setIsEditing(true),
+            }
+      }
     >
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
         <Box sx={{ position: "relative" }}>
@@ -128,18 +133,10 @@ export default function UserProfileCard({ userId, onEditProfile }: UserProfileCa
               size="small"
             />
             <Stack direction="row" spacing={1} sx={{ width: "100%" }}>
-              <Button
-                variant="outlined"
-                onClick={handleCancel}
-                fullWidth
-              >
+              <Button variant="outlined" onClick={handleCancel} fullWidth>
                 Cancel
               </Button>
-              <Button
-                variant="contained"
-                onClick={handleSave}
-                fullWidth
-              >
+              <Button variant="contained" onClick={handleSave} fullWidth>
                 Save
               </Button>
             </Stack>
@@ -155,4 +152,4 @@ export default function UserProfileCard({ userId, onEditProfile }: UserProfileCa
       </Box>
     </Card>
   );
-} 
+}

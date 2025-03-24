@@ -36,7 +36,6 @@ function expectedCommentResponse(): CommentResponse {
   };
 }
 
-// eslint-disable-next-line max-statements
 beforeAll(async () => {
   const { dbConnectionString, closeDatabase } = await createDatabase();
   teardown.add(closeDatabase);
@@ -128,11 +127,11 @@ describe("GET /comments", () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
+      hasMore: false,
       items: [expectedCommentResponse()],
-      total: 1,
-      page: 1,
       limit: 10,
-      hasMore: false
+      page: 1,
+      total: 1,
     });
   });
 
@@ -143,11 +142,11 @@ describe("GET /comments", () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
+      hasMore: false,
       items: [expectedCommentResponse()],
-      total: 1,
-      page: 1,
       limit: 10,
-      hasMore: false
+      page: 1,
+      total: 1,
     });
   });
 
@@ -158,11 +157,11 @@ describe("GET /comments", () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
+      hasMore: false,
       items: [],
-      total: 0,
-      page: 1,
       limit: 10,
-      hasMore: false
+      page: 1,
+      total: 0,
     });
   });
 });
