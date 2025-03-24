@@ -1,4 +1,12 @@
-import { Box, Container, Divider, Paper, Typography, CircularProgress, IconButton } from "@mui/material";
+import {
+  Box,
+  Container,
+  Divider,
+  Paper,
+  Typography,
+  CircularProgress,
+  IconButton,
+} from "@mui/material";
 import { EntityID } from "../utils/api";
 import usePost from "../hooks/usePost";
 import UserDetails from "./UserDetails";
@@ -13,7 +21,7 @@ import LikeButton from "./LikeButton";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PostComment } from "../hooks/usePostComments";
-import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
+import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import useAuth from "../hooks/useAuth";
 import useSnackbar from "../hooks/useSnackbar";
 import { deletePost } from "../services/posts";
@@ -50,14 +58,7 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
     onLoadMore: loadMore,
   });
 
-  useEffect(() => {
-    if (post) {
-      setTotalLikes(post.likes);
-      fetchLikeStatus();
-    }
-  }, [post]);
-
-  const fetchLikeStatus = async () => {
+  const fetchLikeStatus = useCallback(async () => {
     try {
       const { likes, likedByMe } = await getPostLikes(postId);
       setTotalLikes(likes);
@@ -65,20 +66,27 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
     } catch (error) {
       console.error("Failed to fetch like status:", error);
     }
-  };
+  }, [postId]);
+
+  useEffect(() => {
+    if (post) {
+      setTotalLikes(post.likes);
+      fetchLikeStatus();
+    }
+  }, [fetchLikeStatus, post]);
 
   const handleCommentAdded = useCallback(
     (comment: PostComment) => {
       addComment(comment);
     },
-    [addComment]
+    [addComment],
   );
 
   const handleCommentDeleted = useCallback(
     (commentId: string) => {
       deleteComment(commentId);
     },
-    [deleteComment]
+    [deleteComment],
   );
 
   const handleDelete = useCallback(async () => {
@@ -96,16 +104,16 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
     navigate(`/posts/${postId}/edit`);
   }, [navigate, postId]);
 
-  const handleClick = (e: React.MouseEvent) => {
-    // Prevent navigation if clicking on interactive elements
-    if (
-      (e.target as HTMLElement).closest('button') ||
-      showComments // Don't navigate if we're already in the post view
-    ) {
-      return;
-    }
-    navigate(`/posts/${postId}`);
-  };
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Prevent navigation if clicking on interactive elements or if we're already in the post view
+      if ((e.target as HTMLElement).closest("button") || showComments) {
+        return;
+      }
+      navigate(`/posts/${postId}`);
+    },
+    [navigate, postId, showComments],
+  );
 
   if (isLoading || commentsLoading) {
     return <Typography>Loading...</Typography>;
@@ -123,20 +131,20 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
   const isAuthor = userId === post.author;
 
   return (
-    <Container maxWidth="md">
-      <Paper 
-        variant="outlined" 
-        sx={{ 
-          padding: 2, 
-          borderRadius: 8,
-          cursor: showComments ? 'default' : 'pointer',
-          '&:hover': {
-            backgroundColor: showComments ? 'transparent' : 'action.hover'
-          }
+    <Container maxWidth="md" disableGutters sx={{ my: 3 }}>
+      <Paper
+        variant="outlined"
+        sx={{
+          padding: 2,
+          borderRadius: 2,
+          cursor: showComments ? "default" : "pointer",
+          "&:hover": {
+            backgroundColor: showComments ? "transparent" : "action.hover",
+          },
         }}
         onClick={handleClick}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <UserDetails userId={post.author} />
           {isAuthor && (
             <Box>
@@ -182,13 +190,9 @@ export default function Post({ postId, showComments = false, onDelete }: PostPro
           {showComments && (
             <>
               {comments.length > 0 && <Divider sx={{ my: 2 }} />}
-              <Box sx={{ maxHeight: showComments ? '400px' : 'auto', overflowY: 'auto' }}>
+              <Box sx={{ maxHeight: showComments ? "400px" : "auto", overflowY: "auto" }}>
                 {comments.map((comment) => (
-                  <Comment 
-                    key={comment.id} 
-                    comment={comment} 
-                    onDelete={handleCommentDeleted}
-                  />
+                  <Comment key={comment.id} comment={comment} onDelete={handleCommentDeleted} />
                 ))}
                 {hasMore && (
                   <Box ref={loaderRef} display="flex" justifyContent="center" my={2}>

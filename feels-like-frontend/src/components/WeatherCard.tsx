@@ -8,7 +8,12 @@ interface WeatherCardProps {
   recommendedClothes: string;
 }
 
-export function WeatherCard({ temperature, condition, location, recommendedClothes }: WeatherCardProps) {
+export function WeatherCard({
+  temperature,
+  condition,
+  location,
+  recommendedClothes,
+}: WeatherCardProps) {
   return (
     <Card title="Current Weather">
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -25,4 +30,4 @@ export function WeatherCard({ temperature, condition, location, recommendedCloth
       </Box>
     </Card>
   );
-} 
+}

@@ -6,7 +6,7 @@ import { Conflict, NotFound } from "http-errors";
 type ControllerMethod = (req: Request, res: Response) => Promise<void>;
 
 type WrappedMongooseError = MongooseError & { cause: MongoServerError };
-const DuplicateKeyErrorCode = 11000;
+export const DuplicateKeyErrorCode = 11000;
 
 function handleDBError(error: unknown) {
   if (!(error instanceof MongooseError)) {

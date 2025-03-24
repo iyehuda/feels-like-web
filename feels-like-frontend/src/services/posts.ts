@@ -3,7 +3,7 @@ import { EntityID } from "../utils/api";
 
 interface PostData {
   content: string;
-  image?: File; // Accepts undefined instead of null
+  image?: File;
 }
 
 export async function createPost(post: PostData): Promise<void> {

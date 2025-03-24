@@ -28,39 +28,45 @@ const apiSpecs = swaggerJSDoc({
   },
 });
 
-// eslint-disable-next-line max-statements
+// eslint-disable-next-line max-lines-per-function, max-statements
 export function createApp() {
   const app = express();
 
   app.use(morgan(environment === Environment.PROD ? "combined" : "dev"));
-  app.use(bodyParser.json({ limit: '10mb' }));
-  app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
-  
+  app.use(bodyParser.json({ limit: "10mb" }));
+  app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
+
+  const corsOptions = {
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  };
+
   // Configure CORS based on environment
   if (environment === Environment.DEV) {
-    app.use(cors({
-      origin: true, // Allow all origins in development
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization']
-    }));
+    app.use(
+      cors({
+        ...corsOptions,
+        origin: true,
+      }),
+    );
   } else {
-    app.use(cors({
-      origin: [
-        'https://node50.cs.colman.ac.il:443',
-        'https://node50.cs.colman.ac.il',
-        'https://localhost:443',
-        'https://localhost'
-      ],
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization']
-    }));
+    app.use(
+      cors({
+        ...corsOptions,
+        origin: [
+          "https://node50.cs.colman.ac.il:443",
+          "https://node50.cs.colman.ac.il",
+          "https://localhost:443",
+          "https://localhost",
+        ],
+      }),
+    );
   }
 
   // Root path handler
-  app.get('/', (req, res) => {
-    res.json({ message: 'Feels Like API is running' });
+  app.get("/", (req, res) => {
+    res.json({ message: "Feels Like API is running" });
   });
 
   if (environment !== Environment.PROD) {
@@ -68,11 +74,14 @@ export function createApp() {
   }
 
   // Serve static files with error handling
-  app.use(`/${uploadsDir}`, express.static(path.join(process.cwd(), uploadsDir), {
-    setHeaders: (res, path) => {
-      res.set('Cross-Origin-Resource-Policy', 'cross-origin');
-    }
-  }));
+  app.use(
+    `/${uploadsDir}`,
+    express.static(path.join(process.cwd(), uploadsDir), {
+      setHeaders: (res) => {
+        res.set("Cross-Origin-Resource-Policy", "cross-origin");
+      },
+    }),
+  );
 
   app.use("/auth", authRouter);
   app.use("/users", authMiddleware, userRouter);
@@ -80,7 +89,6 @@ export function createApp() {
   app.use("/comments", authMiddleware, commentRouter);
   app.use("/posts", authMiddleware, likeRouter);
   app.use("/weather", authMiddleware, weatherRouter);
-
 
   // Error handlers
   app.use(errors());

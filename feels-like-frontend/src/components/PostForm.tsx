@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Box, Paper, TextField, Button, Typography } from "@mui/material";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import useSnackbar from "../hooks/useSnackbar";
@@ -49,7 +49,7 @@ export default function PostForm({
     reader.readAsDataURL(image);
   }, [image, showSnackbar]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!content.trim()) {
       showSnackbar("Post content is required!", "error");
       return;
@@ -60,7 +60,7 @@ export default function PostForm({
     } catch (error) {
       showSnackbar(error instanceof Error ? error.message : "Failed to submit post", "error");
     }
-  };
+  }, [content, image, onSubmit, showSnackbar]);
 
   return (
     <Paper variant="outlined" sx={{ padding: "3%", borderRadius: 8, mt: "3%" }}>
@@ -133,15 +133,10 @@ export default function PostForm({
 
       {/* Submit Button */}
       <Box display="flex" justifyContent="flex-end" mt="3%">
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          disabled={isLoading}
-        >
+        <Button variant="contained" color="primary" onClick={handleSubmit} disabled={isLoading}>
           {isLoading ? "Submitting..." : submitButtonText}
         </Button>
       </Box>
     </Paper>
   );
-} 
+}

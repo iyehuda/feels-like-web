@@ -104,7 +104,7 @@ userRouter
     celebrate(idParamSchema),
     upload.single("avatar"),
     celebrate(updateProfileSchema),
-    controller.updateProfile.bind(controller)
+    controller.updateProfile.bind(controller),
   );
 
 export default userRouter;

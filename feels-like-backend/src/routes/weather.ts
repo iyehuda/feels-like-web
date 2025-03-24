@@ -62,4 +62,4 @@ const weatherController = new WeatherController();
  */
 router.get("/current", authMiddleware, (req, res) => weatherController.getCurrentWeather(req, res));
 
-export default router; 
+export default router;

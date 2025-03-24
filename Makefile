@@ -16,7 +16,7 @@ test:
 	cd feels-like-backend && npm run test
 
 db:
-	docker compose up -d
+	docker compose up -d db
 
 dev: db
 	npx concurrently -k "cd feels-like-backend && npm run dev" "cd feels-like-frontend && npm run dev"

@@ -2,11 +2,18 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import { EntityID } from "../utils/api";
 import usePostComments from "../hooks/usePostComments";
 import Comment from "./Comment";
-import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
+import useInfiniteScroll from "../hooks/useInfiniteScroll";
 
 export default function CommentsList({ postId }: { postId: EntityID }) {
-  const { comments, error, isLoading, isLoadingMore, hasMore = false, loadMore } = usePostComments(postId);
-  
+  const {
+    comments,
+    error,
+    isLoading,
+    isLoadingMore,
+    hasMore = false,
+    loadMore,
+  } = usePostComments(postId);
+
   const loaderRef = useInfiniteScroll({
     hasMore,
     isLoading: Boolean(isLoadingMore),
@@ -45,4 +52,4 @@ export default function CommentsList({ postId }: { postId: EntityID }) {
       )}
     </Box>
   );
-} 
+}

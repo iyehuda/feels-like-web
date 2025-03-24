@@ -72,23 +72,18 @@ export default class CommentsController extends BaseController<IComment> {
     }
 
     const skip = (Number(page) - 1) * Number(limit);
-    
+
     const [items, total] = await Promise.all([
-      this.model
-        .find(filter)
-        .sort({ _id: -1 })
-        .skip(skip)
-        .limit(Number(limit))
-        .exec(),
-      this.model.countDocuments(filter)
+      this.model.find(filter).sort({ _id: -1 }).skip(skip).limit(Number(limit)).exec(),
+      this.model.countDocuments(filter),
     ]);
 
     res.json({
+      hasMore: skip + items.length < total,
       items,
-      total,
-      page: Number(page),
       limit: Number(limit),
-      hasMore: skip + items.length < total
+      page: Number(page),
+      total,
     });
   }
 }
